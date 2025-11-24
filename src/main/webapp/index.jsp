@@ -8,6 +8,15 @@
 <h1><%= "Hello World!" %>
 </h1>
 <br/>
-<a href="hello-servlet">Hello Servlet</a>
+<form action = "controller">
+  <input type ="hidden" name ="command" value = "login"/>
+  Login:  <input type = "text" name = "login" value=""/>
+  <br/>
+  Password: <input type = "password" name = "pass" value =""/>
+  <br/>
+  <input type="submit" name="sub" value="Push"/>
+  <br/>
+  ${login_err}
+</form>
 </body>
 </html>
