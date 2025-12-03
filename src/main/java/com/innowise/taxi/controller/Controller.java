@@ -8,26 +8,26 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
-@WebServlet(name = "helloServlet", value = "/controller")
+@WebServlet(name = "Servlet", value = "/controller")
 public class Controller extends HttpServlet {
 
-    public void init() {}
+  public void init() {}
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType("text/html");
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    response.setContentType("text/html");
 
-        String commandStr = request.getParameter("command");
-        Command command = CommandType.parse(commandStr);
-        String page = command.execute(request);
-        request.getRequestDispatcher(page).forward(request, response);
-    }
+    String commandStr = request.getParameter("command");
+    Command command = CommandType.parse(commandStr);
+    String page = command.execute(request);
+    request.getRequestDispatcher(page).forward(request, response);
+  }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
-    }
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    super.doPost(req, resp);
+  }
 
-    public void destroy() {
-    }
+  public void destroy() {
+  }
 }
