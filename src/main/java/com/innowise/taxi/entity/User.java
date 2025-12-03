@@ -1,17 +1,17 @@
 package com.innowise.taxi.entity;
 
 public class User extends AbstractEntity {
-  private String login;
+  private String username;
   private String password;
 
-  public User(Long id, String login, String password) {
+  public User(Long id, String username, String password) {
     super(id);
-    this.login = login;
+    this.username = username;
     this.password = password;
   }
 
-  public String getLogin() {
-    return login;
+  public String getUsername() {
+    return username;
   }
 
   public String getPassword() {

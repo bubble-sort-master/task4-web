@@ -1,26 +1,23 @@
 package com.innowise.taxi.pool;
 
+import com.innowise.taxi.exception.PoolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Properties;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class ConnectionPool {
   private static final Logger logger = LogManager.getLogger(ConnectionPool.class);
   private static final int POOL_SIZE = 10;
   private static final ConnectionPool instance = new ConnectionPool();
-  private final Deque<Connection> availableConnections = new ArrayDeque<>();
-  private final ReentrantLock lock = new ReentrantLock();
-  private final Condition connectionAvailable = lock.newCondition();
+  private final BlockingQueue<Connection> connections;
 
   private ConnectionPool() {
     try {
@@ -31,12 +28,14 @@ public class ConnectionPool {
       String user = props.getProperty("db.user");
       String password = props.getProperty("db.password");
 
+      connections = new ArrayBlockingQueue<>(POOL_SIZE);
+
       for (int i = 0; i < POOL_SIZE; i++) {
         Connection connection = DriverManager.getConnection(url, user, password);
-        availableConnections.add(connection);
+        connections.add(connection);
       }
       logger.info("Connection pool initialized with size {}", POOL_SIZE);
-    } catch (IOException | ClassNotFoundException | SQLException e) {
+    } catch (PoolException | ClassNotFoundException | SQLException e) {
       throw new ExceptionInInitializerError("Failed to initialize connection pool: " + e.getMessage());
     }
   }
@@ -45,70 +44,54 @@ public class ConnectionPool {
     return instance;
   }
 
-  private Properties loadProperties() throws IOException {
+  private Properties loadProperties() throws PoolException {
     Properties props = new Properties();
     try (InputStream in = getClass().getClassLoader().getResourceAsStream("db.properties")) {
-      if (in == null) throw new IOException("db.properties not found");
+      if (in == null) {
+        throw new PoolException("db.properties not found");
+      }
       props.load(in);
+    } catch (IOException e) {
+      throw new PoolException("Error loading db.properties");
     }
     return props;
   }
 
   public Connection getConnection() {
-    lock.lock();
     try {
-      while (availableConnections.isEmpty()) {
-        connectionAvailable.await();
-      }
-      return availableConnections.poll();
+      return connections.take();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return null;
-    } finally {
-      lock.unlock();
     }
   }
 
   public void releaseConnection(Connection connection) {
-    lock.lock();
-    try {
-      availableConnections.offer(connection);
-      connectionAvailable.signal();
-    } finally {
-      lock.unlock();
+    if (connection != null) {
+      connections.offer(connection);
     }
   }
 
   public void shutdown() {
-    lock.lock();
-    try {
-      for (Connection connection : availableConnections) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          logger.error("Error closing connection", e);
-        }
-      }
-      availableConnections.clear();
-      logger.info("Connection pool shut down");
-
+    for (Connection connection : connections) {
       try {
-        var drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-          var driver = drivers.nextElement();
-          try {
-            DriverManager.deregisterDriver(driver);
-            logger.info("Deregistered JDBC driver {}", driver);
-          } catch (SQLException e) {
-            logger.error("Error deregistering driver {}", driver, e);
-          }
-        }
-      } catch (Exception e) {
-        logger.error("Unexpected error during driver deregistration", e);
+        connection.close();
+      } catch (SQLException e) {
+        logger.error("Error closing connection", e);
       }
-    } finally {
-      lock.unlock();
     }
-  }
+    connections.clear();
+    logger.info("Connection pool shut down");
 
+      var drivers = DriverManager.getDrivers();
+      while (drivers.hasMoreElements()) {
+        var driver = drivers.nextElement();
+        try {
+          DriverManager.deregisterDriver(driver);
+          logger.info("Deregistered JDBC driver {}", driver);
+        } catch (SQLException e) {
+          logger.error("Error deregistering driver {}", driver, e);
+        }
+      }
+  }
 }
