@@ -1,6 +1,6 @@
 package com.innowise.taxi.service.impl;
 
-import com.innowise.taxi.dao.impl.UserDao;
+import com.innowise.taxi.dao.impl.UserDaoImpl;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
@@ -13,7 +13,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
   private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
   private static final UserServiceImpl instance = new UserServiceImpl();
-  private final UserDao userDao = new UserDao();
+  private final UserDaoImpl userDaoImpl = new UserDaoImpl();
 
   private UserServiceImpl() {}
 
@@ -22,11 +22,11 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean authentificate(String username, String password) throws ServiceException {
+  public boolean authenticate(String username, String password) throws ServiceException {
     try {
-      Optional<User> userOpt = userDao.findByLogin(username);
-      if (userOpt.isPresent()) {
-        User user = userOpt.get();
+      Optional<User> userOptional = userDaoImpl.findByUsername(username);
+      if (userOptional.isPresent()) {
+        User user = userOptional.get();
         if (user.getPassword().equals(password)) {
           logger.info("Authentication successful for user {}", username);
           return true;
@@ -43,4 +43,22 @@ public class UserServiceImpl implements UserService {
       throw new ServiceException(e);
     }
   }
+
+  @Override
+  public boolean register(User user) throws ServiceException {
+    try {
+      boolean saved = userDaoImpl.save(user);
+      if (saved) {
+        logger.info("Registration successful for user {}", user.getUsername());
+        return true;
+      } else {
+        logger.warn("Registration failed: user {} not saved", user.getUsername());
+        return false;
+      }
+    } catch (DaoException e) {
+      logger.error("Service error during registration for user {}", user.getUsername(), e);
+      throw new ServiceException("Registration failed", e);
+    }
+  }
+
 }

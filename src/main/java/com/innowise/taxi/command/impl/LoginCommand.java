@@ -19,7 +19,7 @@ public class LoginCommand implements Command {
     UserService userService = UserServiceImpl.getInstance();
     String page;
     try {
-      if (userService.authentificate(login, password)) {
+      if (userService.authenticate(login, password)) {
         request.setAttribute("user", login);
         page = "pages/main.jsp";
       } else {

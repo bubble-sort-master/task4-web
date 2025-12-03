@@ -6,6 +6,7 @@ import com.innowise.taxi.exception.DaoException;
 import java.util.List;
 import java.util.Optional;
 
+//NOTE: currently not in use
 public abstract class AbstractDao<T extends AbstractEntity> {
   public abstract boolean insert(T entity) throws DaoException;
   public abstract boolean delete(T entity) throws DaoException;

@@ -11,6 +11,6 @@
   <title>500</title>
 </head>
 <body>
-java.lang.Throwable
+some java exception
 </body>
 </html>
