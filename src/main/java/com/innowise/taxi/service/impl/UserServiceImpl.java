@@ -50,14 +50,19 @@ public class UserServiceImpl implements UserService {
       boolean saved = userDaoImpl.save(user);
       if (saved) {
         logger.info("Registration successful for user {}", user.getUsername());
-        return true;
       } else {
-        logger.warn("Registration failed: user {} not saved", user.getUsername());
-        return false;
+        logger.warn("Registration failed for user {}", user.getUsername());
       }
+      return saved;
     } catch (DaoException e) {
       logger.error("Service error during registration for user {}", user.getUsername(), e);
-      throw new ServiceException("Registration failed", e);
+      return switch (e.getErrorCode()) {
+        case DUPLICATE_KEY, NULL_VALUE -> {
+          logger.warn("Registration failed for user {} due to {}", user.getUsername(), e.getErrorCode());
+          yield false;
+        }
+        default -> throw new ServiceException("Registration failed", e);
+      };
     }
   }
 

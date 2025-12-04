@@ -2,6 +2,7 @@ package com.innowise.taxi.dao.impl;
 import com.innowise.taxi.dao.UserDao;
 import com.innowise.taxi.dao.constants.UserColumn;
 import com.innowise.taxi.entity.User;
+import com.innowise.taxi.exception.DaoErrorCode;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.pool.ConnectionPool;
 import org.apache.logging.log4j.LogManager;
@@ -13,8 +14,8 @@ public class UserDaoImpl implements UserDao {
   private static final Logger logger = LogManager.getLogger(UserDaoImpl.class);
   private static final String SELECT_BY_USERNAME = "SELECT id, username, password FROM users WHERE username = ?";
   private static final String INSERT_USER = """
-    INSERT INTO users (username, password, first_name, last_name, role, is_banned)
-    VALUES (?, ?, ?, ?, 'CLIENT', 0)
+    INSERT INTO users (username, password, first_name, last_name)
+    VALUES (?, ?, ?, ?)
     """;
 
   @Override
@@ -58,17 +59,18 @@ public class UserDaoImpl implements UserDao {
         stmt.setString(4, user.getLastName());
 
         int rows = stmt.executeUpdate();
-        if (rows > 0) {
-          logger.info("User {} successfully saved to database", user.getUsername());
-          return true;
-        } else {
-          logger.warn("User {} was not saved to database", user.getUsername());
-          return false;
-        }
+        return rows > 0;
+      }
+    } catch (SQLIntegrityConstraintViolationException e) {
+      logger.warn("Constraint violation while saving user {}: {}", user.getUsername(), e.getMessage());
+      if (e.getMessage().contains("NULL")) {
+        throw new DaoException("Null value in required field", e, DaoErrorCode.NULL_VALUE);
+      } else {
+        throw new DaoException("Duplicate key", e, DaoErrorCode.DUPLICATE_KEY);
       }
     } catch (SQLException e) {
-      logger.error("Error saving user {}", user.getUsername(), e);
-      throw new DaoException("Error saving user", e);
+      logger.error("SQL error while saving user {}", user.getUsername(), e);
+      throw new DaoException("SQL error while saving user", e, DaoErrorCode.SQL_ERROR);
     } finally {
       ConnectionPool.getInstance().releaseConnection(connection);
     }

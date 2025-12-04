@@ -14,8 +14,6 @@ public class User extends AbstractEntity {
     this.password = password;
     this.firstName = firstName;
     this.lastName = lastName;
-    this.role = "CLIENT";
-    this.banned = false;
   }
 
   public User(long id, String username, String password) {

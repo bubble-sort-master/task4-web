@@ -8,6 +8,8 @@ import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.UserService;
 import com.innowise.taxi.service.impl.UserServiceImpl;
+import com.innowise.taxi.validator.CustomValidator;
+import com.innowise.taxi.validator.impl.UserValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,29 +23,33 @@ public class RegisterCommand implements Command {
     String password = request.getParameter(ParameterName.PASSWORD);
     String firstName = request.getParameter(ParameterName.FIRST_NAME);
     String lastName = request.getParameter(ParameterName.LAST_NAME);
-    logger.debug("accepted user input {}, {}, {}, {}", username, password, firstName, lastName);
 
     UserService userService = UserServiceImpl.getInstance();
     String page;
     try {
       User user = new User(username, password, firstName, lastName);
-      boolean registered = userService.register(user);
+      CustomValidator<User> validator = new UserValidator();
+      if (!validator.isValid(user)) {
+        logger.warn("Registration failed: invalid input for user {}", username);
+        request.setAttribute(AttributeName.REGISTER_ERROR, "Invalid input data");
+        return PagePath.REGISTER;
+      }
 
+      boolean registered = userService.register(user);
       if (registered) {
+        logger.info("User {} registered successfully", username);
         request.setAttribute(AttributeName.USER, username);
         page = PagePath.MAIN;
       } else {
-        logger.warn("Registration failed: user {} not saved", username);
-        request.setAttribute(AttributeName.REGISTER_ERROR, "registration failed");
+        logger.warn("Registration failed for user {}", username);
+        request.setAttribute(AttributeName.REGISTER_ERROR, "username already exists or invalid input");
         page = PagePath.REGISTER;
       }
     } catch (ServiceException e) {
-      //TODO: correct exception handling here and in related places
-      logger.error("Registration failed for user {}", username, e);
+      logger.error("Registration failed due to service error for user {}", username, e);
       request.setAttribute(AttributeName.REGISTER_ERROR, "internal error, please try later");
       page = PagePath.REGISTER;
     }
     return page;
   }
-
 }
