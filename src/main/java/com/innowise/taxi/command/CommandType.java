@@ -17,10 +17,14 @@ public enum CommandType {
         this.command = command;
     }
 
-    //TODO: handle default command
-    public static Command parse(String commandStr){
-        CommandType type = CommandType.valueOf(commandStr.toUpperCase());
-        return type.command;
+    public static Command parse(String commandStr) {
+        try {
+            CommandType type = CommandType.valueOf(commandStr.toUpperCase());
+            return type.command;
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return DEFAULT.command;
+        }
     }
+
 
 }

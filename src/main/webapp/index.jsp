@@ -16,6 +16,7 @@
   <input type="submit" value="Login"/>
   <br/>
   ${login_err}
+  ${default_err}
 </form>
 <br/>
 <a href="pages/register.jsp">Зарегистрироваться</a>
