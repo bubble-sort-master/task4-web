@@ -1,6 +1,6 @@
 package com.innowise.taxi.dao.impl;
-
 import com.innowise.taxi.dao.UserDao;
+import com.innowise.taxi.dao.constants.UserColumn;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.pool.ConnectionPool;
@@ -27,9 +27,9 @@ public class UserDaoImpl implements UserDao {
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
             User user = new User(
-                    result.getLong("id"),
-                    result.getString("username"),
-                    result.getString("password")
+                    result.getLong(UserColumn.ID),
+                    result.getString(UserColumn.USERNAME),
+                    result.getString(UserColumn.PASSWORD)
             );
             logger.info("User {} found in database", username);
             return Optional.of(user);
