@@ -16,11 +16,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RegisterCommand implements Command {
-  private static final Logger logger = LogManager.getLogger(RegisterCommand.class);
+  private static final Logger logger = LogManager.getLogger();
 
   @Override
   public String execute(HttpServletRequest request) {
-    String username = request.getParameter(ParameterName.LOGIN);
+    String username = request.getParameter(ParameterName.USERNAME);
     String password = request.getParameter(ParameterName.PASSWORD);
     String firstName = request.getParameter(ParameterName.FIRST_NAME);
     String lastName = request.getParameter(ParameterName.LAST_NAME);
@@ -40,7 +40,7 @@ public class RegisterCommand implements Command {
       if (registered) {
         logger.info("User {} registered successfully", username);
         HttpSession session = request.getSession();
-        session.setAttribute(AttributeName.USER, username);
+        session.setAttribute(AttributeName.USERNAME, username);
         page = PagePath.MAIN;
       } else {
         logger.warn("Registration failed for user {}", username);

@@ -9,7 +9,7 @@
 <h2>Вход</h2>
 <form action="controller" method="post">
   <input type="hidden" name="command" value="login"/>
-  Login: <input type="text" name="login"/>
+  Username: <input type="text" name="username"/>
   <br/>
   Password: <input type="password" name="pass"/>
   <br/>

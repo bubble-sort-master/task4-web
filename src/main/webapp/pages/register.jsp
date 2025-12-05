@@ -5,7 +5,7 @@
 <h2>Register</h2>
 <form action="${pageContext.request.contextPath}/controller" method="post">
   <input type="hidden" name="command" value="register"/>
-  Username: <input type="text" name="login" required/><br/>
+  Username: <input type="text" name="username" required/><br/>
   Password: <input type="password" name="pass" required/><br/>
   First name: <input type="text" name="firstName" required/><br/>
   Last name: <input type="text" name="lastName"/><br/>

@@ -6,6 +6,6 @@ import com.innowise.taxi.exception.DaoException;
 import java.util.Optional;
 
 public interface UserDao {
-  public Optional<User> findByUsername(String username) throws DaoException;
-  public boolean save(User user) throws DaoException;
+  Optional<User> findByUsername(String username) throws DaoException;
+  boolean save(User user) throws DaoException;
 }

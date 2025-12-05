@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 @WebListener
 public class SessionAttributeListener implements HttpSessionAttributeListener {
 
-  private static final Logger logger = LogManager.getLogger(SessionAttributeListener.class);
+  private static final Logger logger = LogManager.getLogger();
 
   @Override
   public void attributeAdded(HttpSessionBindingEvent sbe) {

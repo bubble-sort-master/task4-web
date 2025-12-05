@@ -1,4 +1,4 @@
-package com.innowise.taxi.dao.constants;
+package com.innowise.taxi.dao.constant;
 
 public class UserColumn {
   public static final String ID = "id";

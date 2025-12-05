@@ -4,7 +4,7 @@
   <title>Main</title>
 </head>
 <body>
-Hello ${user}
+Hello ${username}
 <br/><br/>
 <form action="controller">
   <input type="hidden" name="command" value="logout"/>

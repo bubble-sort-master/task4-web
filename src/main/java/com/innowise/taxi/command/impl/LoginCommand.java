@@ -14,25 +14,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LoginCommand implements Command {
-  private static final Logger logger = LogManager.getLogger(LoginCommand.class);
+  private static final Logger logger = LogManager.getLogger();
 
   @Override
   public String execute(HttpServletRequest request) {
-    String login = request.getParameter(ParameterName.LOGIN);
+    String username = request.getParameter(ParameterName.USERNAME);
     String password = request.getParameter(ParameterName.PASSWORD);
     UserService userService = UserServiceImpl.getInstance();
     String page;
     try {
-      if (userService.authenticate(login, password)) {
+      if (userService.authenticate(username, password)) {
         HttpSession session = request.getSession();
-        session.setAttribute(AttributeName.USER, login);
+        session.setAttribute(AttributeName.USERNAME, username);
         page = PagePath.MAIN;
       } else {
         request.setAttribute(AttributeName.LOGIN_ERROR, "authentication failed");
         page = PagePath.INDEX;
       }
     } catch (ServiceException e) {
-      logger.error("Login failed due to service error for user {}", login, e);
+      logger.error("Login failed due to service error for user {}", username, e);
       request.setAttribute(AttributeName.LOGIN_ERROR, "internal error, please try later");
       page = PagePath.INDEX;
     }

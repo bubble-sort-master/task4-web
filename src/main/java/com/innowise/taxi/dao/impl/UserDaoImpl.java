@@ -1,6 +1,6 @@
 package com.innowise.taxi.dao.impl;
 import com.innowise.taxi.dao.UserDao;
-import com.innowise.taxi.dao.constants.UserColumn;
+import com.innowise.taxi.dao.constant.UserColumn;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoErrorCode;
 import com.innowise.taxi.exception.DaoException;
@@ -11,7 +11,7 @@ import java.sql.*;
 import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
-  private static final Logger logger = LogManager.getLogger(UserDaoImpl.class);
+  private static final Logger logger = LogManager.getLogger();
   private static final String SELECT_BY_USERNAME = "SELECT id, username, password FROM users WHERE username = ?";
   private static final String INSERT_USER = """
     INSERT INTO users (username, password, first_name, last_name)

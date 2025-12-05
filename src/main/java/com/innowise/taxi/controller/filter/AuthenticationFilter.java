@@ -40,7 +40,7 @@ public class AuthenticationFilter implements Filter {
     boolean isLoginPage = uri.endsWith(PagePath.INDEX);
     boolean isRegisterPage = uri.contains(PagePath.REGISTER);
 
-    if (session == null || session.getAttribute(AttributeName.USER) == null) {
+    if (session == null || session.getAttribute(AttributeName.USERNAME) == null) {
       if (isLoginPage || isRegisterPage || isLoginCommand || isRegisterCommand || isLogoutCommand) {
         chain.doFilter(request, response);
       } else {

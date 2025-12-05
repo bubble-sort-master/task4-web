@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
-  private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
+  private static final Logger logger = LogManager.getLogger();
   private static final UserServiceImpl instance = new UserServiceImpl();
   private final UserDaoImpl userDaoImpl = new UserDaoImpl();
 
