@@ -1,9 +1,9 @@
 package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.command.Command;
-import com.innowise.taxi.command.constants.AttributeName;
-import com.innowise.taxi.command.constants.PagePath;
-import com.innowise.taxi.command.constants.ParameterName;
+import com.innowise.taxi.constant.AttributeName;
+import com.innowise.taxi.constant.PagePath;
+import com.innowise.taxi.constant.ParameterName;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.UserService;
@@ -11,6 +11,7 @@ import com.innowise.taxi.service.impl.UserServiceImpl;
 import com.innowise.taxi.validator.CustomValidator;
 import com.innowise.taxi.validator.impl.UserValidator;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,7 +39,8 @@ public class RegisterCommand implements Command {
       boolean registered = userService.register(user);
       if (registered) {
         logger.info("User {} registered successfully", username);
-        request.setAttribute(AttributeName.USER, username);
+        HttpSession session = request.getSession();
+        session.setAttribute(AttributeName.USER, username);
         page = PagePath.MAIN;
       } else {
         logger.warn("Registration failed for user {}", username);

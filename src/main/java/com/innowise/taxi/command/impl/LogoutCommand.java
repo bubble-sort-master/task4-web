@@ -1,7 +1,7 @@
 package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.command.Command;
-import com.innowise.taxi.command.constants.PagePath;
+import com.innowise.taxi.constant.PagePath;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class LogoutCommand implements Command {

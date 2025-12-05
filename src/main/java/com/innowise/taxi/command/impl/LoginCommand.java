@@ -1,14 +1,15 @@
 package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.command.Command;
-import com.innowise.taxi.command.constants.AttributeName;
-import com.innowise.taxi.command.constants.PagePath;
-import com.innowise.taxi.command.constants.ParameterName;
+import com.innowise.taxi.constant.AttributeName;
+import com.innowise.taxi.constant.PagePath;
+import com.innowise.taxi.constant.ParameterName;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.UserService;
 import com.innowise.taxi.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +24,8 @@ public class LoginCommand implements Command {
     String page;
     try {
       if (userService.authenticate(login, password)) {
-        request.setAttribute(AttributeName.USER, login);
+        HttpSession session = request.getSession();
+        session.setAttribute(AttributeName.USER, login);
         page = PagePath.MAIN;
       } else {
         request.setAttribute(AttributeName.LOGIN_ERROR, "authentication failed");
