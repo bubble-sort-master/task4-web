@@ -11,7 +11,6 @@ import com.innowise.taxi.service.impl.UserServiceImpl;
 import com.innowise.taxi.validator.CustomValidator;
 import com.innowise.taxi.validator.impl.UserValidator;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,12 +38,11 @@ public class RegisterCommand implements Command {
       boolean registered = userService.register(user);
       if (registered) {
         logger.info("User {} registered successfully", username);
-        HttpSession session = request.getSession();
-        session.setAttribute(AttributeName.USERNAME, username);
-        page = PagePath.MAIN;
+        request.setAttribute(AttributeName.REGISTER_SUCCESS, "Registration successful, please login");
+        page = PagePath.INDEX;
       } else {
         logger.warn("Registration failed for user {}", username);
-        request.setAttribute(AttributeName.REGISTER_ERROR, "username already exists or invalid input");
+        request.setAttribute(AttributeName.REGISTER_ERROR, "username already exists");
         page = PagePath.REGISTER;
       }
     } catch (ServiceException e) {

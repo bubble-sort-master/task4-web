@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
   private static final Logger logger = LogManager.getLogger();
-  private static final String SELECT_BY_USERNAME = "SELECT id, username, password FROM users WHERE username = ?";
+  private static final String SELECT_BY_USERNAME = "SELECT id, username, password, role, first_name, last_name FROM users WHERE username = ?";
   private static final String INSERT_USER = """
     INSERT INTO users (username, password, first_name, last_name)
     VALUES (?, ?, ?, ?)
@@ -30,7 +30,10 @@ public class UserDaoImpl implements UserDao {
             User user = new User(
                     result.getLong(UserColumn.ID),
                     result.getString(UserColumn.USERNAME),
-                    result.getString(UserColumn.PASSWORD)
+                    result.getString(UserColumn.PASSWORD),
+                    result.getString(UserColumn.ROLE),
+                    result.getString(UserColumn.FIRST_NAME),
+                    result.getString(UserColumn.LAST_NAME)
             );
             logger.info("User {} found in database", username);
             return Optional.of(user);

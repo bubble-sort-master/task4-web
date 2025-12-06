@@ -14,19 +14,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-@WebFilter(filterName = "AuthenticationFilter",  urlPatterns = {"/*"})
+@WebFilter(filterName = "AuthenticationFilter", urlPatterns = {"/*"})
 public class AuthenticationFilter implements Filter {
   private static final Logger logger = LogManager.getLogger();
 
-  public void init(FilterConfig config) throws ServletException {
-  }
-
-  public void destroy() {
-  }
-
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-          throws ServletException, IOException {
+          throws IOException, ServletException {
 
     HttpServletRequest httpReq = (HttpServletRequest) request;
     HttpServletResponse httpResp = (HttpServletResponse) response;
@@ -34,6 +28,7 @@ public class AuthenticationFilter implements Filter {
 
     String uri = httpReq.getRequestURI();
     String command = httpReq.getParameter(ParameterName.COMMAND);
+
     boolean isLoginCommand = CommandType.LOGIN.name().equalsIgnoreCase(command);
     boolean isRegisterCommand = CommandType.REGISTER.name().equalsIgnoreCase(command);
     boolean isLogoutCommand = CommandType.LOGOUT.name().equalsIgnoreCase(command);

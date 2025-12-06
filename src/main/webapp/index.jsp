@@ -17,6 +17,7 @@
   <br/>
   ${login_err}
   ${default_err}
+  ${register_success}
 </form>
 <br/>
 <a href="pages/register.jsp">Зарегистрироваться</a>

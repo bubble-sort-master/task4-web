@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-  <title>Main</title>
+  <title>Admin Main</title>
 </head>
 <body>
-<h2>Welcome, ${firstName} ${lastName} (CLIENT)</h2>
+<h2>Welcome, ${firstName} ${lastName} (ADMIN)</h2>
 <p>Username: ${username}</p>
 
 <br/><br/>
