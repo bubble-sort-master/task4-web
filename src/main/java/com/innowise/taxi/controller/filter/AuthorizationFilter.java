@@ -27,22 +27,16 @@ public class AuthorizationFilter implements Filter {
   private static final Set<String> publicPages = Set.of(PagePath.INDEX, PagePath.REGISTER);
   private static final Set<String> publicCommands = Set.of(
           CommandType.LOGIN.name(),
-          CommandType.REGISTER.name()
+          CommandType.REGISTER.name(),
+          CommandType.LOGOUT.name()
   );
 
   static {
     rolePages.put(UserRole.CLIENT, Set.of(PagePath.CLIENT_MAIN));
     rolePages.put(UserRole.DRIVER, Set.of(PagePath.DRIVER_MAIN));
-    rolePages.put(UserRole.ADMIN, Set.of(PagePath.ADMIN_MAIN));
+    rolePages.put(UserRole.ADMIN, Set.of(PagePath.ADMIN_MAIN,  PagePath.ADMIN_USER_LIST));
 
-    roleCommands.put(UserRole.CLIENT, Set.of(
-            CommandType.LOGOUT.name()
-    ));
-    roleCommands.put(UserRole.DRIVER, Set.of(
-            CommandType.LOGOUT.name()
-    ));
     roleCommands.put(UserRole.ADMIN, Set.of(
-            CommandType.LOGOUT.name(),
             CommandType.SHOW_USERS.name()
     ));
   }

@@ -40,6 +40,7 @@ public class RegisterCommand implements Command {
       if (registered) {
         logger.info("User {} registered successfully", username);
         request.setAttribute(AttributeName.REGISTER_SUCCESS, "Registration successful, please login");
+        request.getSession().invalidate();
         page = PagePath.INDEX;
       } else {
         logger.warn("Registration failed for user {}", username);
