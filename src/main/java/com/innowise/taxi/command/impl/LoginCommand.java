@@ -6,7 +6,7 @@ import com.innowise.taxi.command.Router;
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
 import com.innowise.taxi.constant.ParameterName;
-import com.innowise.taxi.entity.Role;
+import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.UserService;
@@ -40,7 +40,7 @@ public class LoginCommand implements Command {
           session.setAttribute(AttributeName.LAST_NAME, user.getLastName());
           session.setAttribute(AttributeName.BONUS_POINTS, user.getBonusPoints());
           session.setAttribute(AttributeName.BANNED, user.isBanned());
-          Role role = user.getRole();
+          UserRole role = user.getRole();
           session.setAttribute(AttributeName.ROLE, role);
 
           switch (role) {

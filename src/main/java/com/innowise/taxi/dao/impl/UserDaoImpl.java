@@ -1,7 +1,7 @@
 package com.innowise.taxi.dao.impl;
 import com.innowise.taxi.dao.UserDao;
 import com.innowise.taxi.dao.constant.UserColumn;
-import com.innowise.taxi.entity.Role;
+import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoErrorCode;
 import com.innowise.taxi.exception.DaoException;
@@ -41,7 +41,7 @@ public class UserDaoImpl implements UserDao {
                     result.getLong(UserColumn.ID),
                     result.getString(UserColumn.USERNAME),
                     result.getString(UserColumn.PASSWORD),
-                    Role.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
+                    UserRole.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
                     result.getString(UserColumn.FIRST_NAME),
                     result.getString(UserColumn.LAST_NAME),
                     result.getInt(UserColumn.BONUS_POINTS),
@@ -104,7 +104,7 @@ public class UserDaoImpl implements UserDao {
                   result.getLong(UserColumn.ID),
                   result.getString(UserColumn.USERNAME),
                   result.getString(UserColumn.PASSWORD),
-                  Role.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
+                  UserRole.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
                   result.getString(UserColumn.FIRST_NAME),
                   result.getString(UserColumn.LAST_NAME),
                   result.getInt(UserColumn.BONUS_POINTS),

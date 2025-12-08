@@ -1,6 +1,6 @@
 package com.innowise.taxi.entity;
 
-public enum Role {
+public enum UserRole {
   CLIENT,
   DRIVER,
   ADMIN

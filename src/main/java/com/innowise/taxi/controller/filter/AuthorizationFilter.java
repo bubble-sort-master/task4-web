@@ -3,7 +3,7 @@ package com.innowise.taxi.controller.filter;
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
 import com.innowise.taxi.constant.ParameterName;
-import com.innowise.taxi.entity.Role;
+import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.command.CommandType;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.*;
@@ -22,8 +22,8 @@ import java.util.Set;
 public class AuthorizationFilter implements Filter {
   private static final Logger logger = LogManager.getLogger();
 
-  private static final Map<Role, Set<String>> rolePages = new HashMap<>();
-  private static final Map<Role, Set<String>> roleCommands = new HashMap<>();
+  private static final Map<UserRole, Set<String>> rolePages = new HashMap<>();
+  private static final Map<UserRole, Set<String>> roleCommands = new HashMap<>();
   private static final Set<String> publicPages = Set.of(PagePath.INDEX, PagePath.REGISTER);
   private static final Set<String> publicCommands = Set.of(
           CommandType.LOGIN.name(),
@@ -31,17 +31,17 @@ public class AuthorizationFilter implements Filter {
   );
 
   static {
-    rolePages.put(Role.CLIENT, Set.of(PagePath.CLIENT_MAIN));
-    rolePages.put(Role.DRIVER, Set.of(PagePath.DRIVER_MAIN));
-    rolePages.put(Role.ADMIN, Set.of(PagePath.ADMIN_MAIN));
+    rolePages.put(UserRole.CLIENT, Set.of(PagePath.CLIENT_MAIN));
+    rolePages.put(UserRole.DRIVER, Set.of(PagePath.DRIVER_MAIN));
+    rolePages.put(UserRole.ADMIN, Set.of(PagePath.ADMIN_MAIN));
 
-    roleCommands.put(Role.CLIENT, Set.of(
+    roleCommands.put(UserRole.CLIENT, Set.of(
             CommandType.LOGOUT.name()
     ));
-    roleCommands.put(Role.DRIVER, Set.of(
+    roleCommands.put(UserRole.DRIVER, Set.of(
             CommandType.LOGOUT.name()
     ));
-    roleCommands.put(Role.ADMIN, Set.of(
+    roleCommands.put(UserRole.ADMIN, Set.of(
             CommandType.LOGOUT.name(),
             CommandType.SHOW_USERS.name()
     ));
@@ -59,7 +59,7 @@ public class AuthorizationFilter implements Filter {
     String uri = httpReq.getRequestURI();
 
     if (session != null && session.getAttribute(AttributeName.USERNAME) != null) {
-      Role role = (Role) session.getAttribute(AttributeName.ROLE);
+      UserRole role = (UserRole) session.getAttribute(AttributeName.ROLE);
       Set<String> allowedPages = rolePages.getOrDefault(role, Set.of());
       Set<String> allowedCommands = roleCommands.getOrDefault(role, Set.of());
 
