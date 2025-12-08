@@ -2,7 +2,9 @@ package com.innowise.taxi.controller.filter;
 
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
+import com.innowise.taxi.constant.ParameterName;
 import com.innowise.taxi.entity.Role;
+import com.innowise.taxi.command.CommandType;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,12 +23,28 @@ public class AuthorizationFilter implements Filter {
   private static final Logger logger = LogManager.getLogger();
 
   private static final Map<Role, Set<String>> rolePages = new HashMap<>();
+  private static final Map<Role, Set<String>> roleCommands = new HashMap<>();
   private static final Set<String> publicPages = Set.of(PagePath.INDEX, PagePath.REGISTER);
+  private static final Set<String> publicCommands = Set.of(
+          CommandType.LOGIN.name(),
+          CommandType.REGISTER.name()
+  );
 
   static {
     rolePages.put(Role.CLIENT, Set.of(PagePath.CLIENT_MAIN));
     rolePages.put(Role.DRIVER, Set.of(PagePath.DRIVER_MAIN));
     rolePages.put(Role.ADMIN, Set.of(PagePath.ADMIN_MAIN));
+
+    roleCommands.put(Role.CLIENT, Set.of(
+            CommandType.LOGOUT.name()
+    ));
+    roleCommands.put(Role.DRIVER, Set.of(
+            CommandType.LOGOUT.name()
+    ));
+    roleCommands.put(Role.ADMIN, Set.of(
+            CommandType.LOGOUT.name(),
+            CommandType.SHOW_USERS.name()
+    ));
   }
 
   @Override
@@ -37,13 +55,13 @@ public class AuthorizationFilter implements Filter {
     HttpServletResponse httpResp = (HttpServletResponse) response;
     HttpSession session = httpReq.getSession(false);
 
-    String command = httpReq.getParameter("command");
-    boolean isLogoutCommand = "LOGOUT".equalsIgnoreCase(command);
+    String command = httpReq.getParameter(ParameterName.COMMAND);
+    String uri = httpReq.getRequestURI();
 
     if (session != null && session.getAttribute(AttributeName.USERNAME) != null) {
       Role role = (Role) session.getAttribute(AttributeName.ROLE);
-      String uri = httpReq.getRequestURI();
       Set<String> allowedPages = rolePages.getOrDefault(role, Set.of());
+      Set<String> allowedCommands = roleCommands.getOrDefault(role, Set.of());
 
       if (uri.endsWith(PagePath.INDEX)) {
         if (!allowedPages.isEmpty()) {
@@ -55,23 +73,19 @@ public class AuthorizationFilter implements Filter {
 
       boolean allowed = allowedPages.stream().anyMatch(uri::endsWith)
               || publicPages.stream().anyMatch(uri::endsWith)
-              || isLogoutCommand;
+              || (command != null && allowedCommands.contains(command.toUpperCase()))
+              || (command != null && publicCommands.contains(command.toUpperCase()));
 
       if (!allowed) {
         logger.warn("Access denied: role {} tried to access {}", role, uri);
-        if (!allowedPages.isEmpty()) {
-          String mainPage = allowedPages.iterator().next();
-          httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
-        } else {
-          httpResp.sendRedirect(httpReq.getContextPath() + "/" + PagePath.INDEX);
-        }
+        String mainPage = allowedPages.isEmpty() ? PagePath.INDEX : allowedPages.iterator().next();
+        httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
         return;
       }
     }
 
     chain.doFilter(request, response);
   }
-
 }
 
 

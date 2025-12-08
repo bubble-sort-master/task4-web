@@ -1,6 +1,7 @@
 package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.command.Command;
+import com.innowise.taxi.command.Router;
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
 import com.innowise.taxi.constant.ParameterName;
@@ -18,7 +19,7 @@ public class RegisterCommand implements Command {
   private static final Logger logger = LogManager.getLogger();
 
   @Override
-  public String execute(HttpServletRequest request) {
+  public Router execute(HttpServletRequest request) {
     String username = request.getParameter(ParameterName.USERNAME);
     String password = request.getParameter(ParameterName.PASSWORD);
     String firstName = request.getParameter(ParameterName.FIRST_NAME);
@@ -32,7 +33,7 @@ public class RegisterCommand implements Command {
       if (!validator.isValid(user)) {
         logger.warn("Registration failed: invalid input for user {}", username);
         request.setAttribute(AttributeName.REGISTER_ERROR, "Invalid input data");
-        return PagePath.REGISTER;
+        return new Router(PagePath.REGISTER, Router.TransitionType.REDIRECT);
       }
 
       boolean registered = userService.register(user);
@@ -50,6 +51,6 @@ public class RegisterCommand implements Command {
       request.setAttribute(AttributeName.REGISTER_ERROR, "internal error, please try later");
       page = PagePath.REGISTER;
     }
-    return page;
+    return new Router(page, Router.TransitionType.REDIRECT);
   }
 }

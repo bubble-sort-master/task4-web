@@ -5,8 +5,9 @@ public class User extends AbstractEntity {
   private String password;
   private String firstName;
   private String lastName;
-  private String role;
+  private Role role;
   private boolean banned;
+  private int bonusPoints;
 
   public User(String username, String password, String firstName, String lastName) {
     super(null);
@@ -16,13 +17,15 @@ public class User extends AbstractEntity {
     this.lastName = lastName;
   }
 
-  public User(long id, String username, String password, String role, String firstName, String lastName) {
+  public User(long id, String username, String password, Role role, String firstName, String lastName, int bonusPoints, boolean banned) {
     super(id);
     this.username = username;
     this.password = password;
     this.role = role;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.bonusPoints = bonusPoints;
+    this.banned = banned;
   }
 
   public String getUsername() {
@@ -41,11 +44,15 @@ public class User extends AbstractEntity {
     return lastName;
   }
 
-  public String getRole() {
+  public Role getRole() {
     return role;
   }
 
   public boolean isBanned() {
     return banned;
+  }
+
+  public int getBonusPoints() {
+    return bonusPoints;
   }
 }

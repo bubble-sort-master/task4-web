@@ -4,6 +4,7 @@ import java.io.*;
 
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.CommandType;
+import com.innowise.taxi.command.Router;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -15,22 +16,30 @@ public class Controller extends HttpServlet {
   public void init() {}
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    response.setContentType("text/html");
-    String commandStr = request.getParameter(COMMAND);
-    Command command = CommandType.parse(commandStr);
-    String page = command.execute(request);
-    request.getRequestDispatcher(page).forward(request, response);
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+    processRequest(request, response);
   }
 
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    response.setContentType("text/html");
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+    processRequest(request, response);
+  }
+
+  private void processRequest(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
     String commandStr = request.getParameter(COMMAND);
     Command command = CommandType.parse(commandStr);
-    String page = command.execute(request);
-    request.getRequestDispatcher(page).forward(request, response);
+    Router router = command.execute(request);
+
+    if (router.getType() == Router.TransitionType.FORWARD) {
+      request.getRequestDispatcher(router.getPage()).forward(request, response);
+    } else {
+      response.sendRedirect(request.getContextPath() + "/" + router.getPage());
+    }
   }
+
 
   public void destroy() {
   }

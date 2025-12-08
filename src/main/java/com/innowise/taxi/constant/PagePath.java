@@ -6,6 +6,7 @@ public class PagePath {
   public static final String REGISTER = "pages/register.jsp";
   public static final String DRIVER_MAIN = "pages/driver.jsp";
   public static final String ADMIN_MAIN = "pages/admin.jsp";
+  public static final String ADMIN_USER_LIST = "pages/admin_user_list.jsp";
 
   private PagePath(){}
 }

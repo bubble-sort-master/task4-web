@@ -2,6 +2,7 @@ package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.auth.AuthResult;
 import com.innowise.taxi.command.Command;
+import com.innowise.taxi.command.Router;
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
 import com.innowise.taxi.constant.ParameterName;
@@ -20,7 +21,7 @@ public class LoginCommand implements Command {
   private static final Logger logger = LogManager.getLogger();
 
   @Override
-  public String execute(HttpServletRequest request) {
+  public Router execute(HttpServletRequest request) {
     String username = request.getParameter(ParameterName.USERNAME);
     String password = request.getParameter(ParameterName.PASSWORD);
     UserService userService = UserServiceImpl.getInstance();
@@ -37,7 +38,9 @@ public class LoginCommand implements Command {
           session.setAttribute(AttributeName.USERNAME, user.getUsername());
           session.setAttribute(AttributeName.FIRST_NAME, user.getFirstName());
           session.setAttribute(AttributeName.LAST_NAME, user.getLastName());
-          Role role = Role.valueOf(user.getRole().toUpperCase());
+          session.setAttribute(AttributeName.BONUS_POINTS, user.getBonusPoints());
+          session.setAttribute(AttributeName.BANNED, user.isBanned());
+          Role role = user.getRole();
           session.setAttribute(AttributeName.ROLE, role);
 
           switch (role) {
@@ -63,7 +66,7 @@ public class LoginCommand implements Command {
       page = PagePath.INDEX;
     }
 
-    return page;
+    return new Router(page, Router.TransitionType.REDIRECT);
   }
 
 }

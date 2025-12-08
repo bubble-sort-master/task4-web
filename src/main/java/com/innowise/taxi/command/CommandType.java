@@ -1,15 +1,13 @@
 package com.innowise.taxi.command;
 
-import com.innowise.taxi.command.impl.RegisterCommand;
-import com.innowise.taxi.command.impl.DefaultCommand;
-import com.innowise.taxi.command.impl.LoginCommand;
-import com.innowise.taxi.command.impl.LogoutCommand;
+import com.innowise.taxi.command.impl.*;
 
 public enum CommandType {
     REGISTER(new RegisterCommand()),
     LOGIN(new LoginCommand()),
     LOGOUT(new LogoutCommand()),
-    DEFAULT(new DefaultCommand());
+    DEFAULT(new DefaultCommand()),
+    SHOW_USERS(new ShowUsersCommand());
 
     final Command command;
 

@@ -10,6 +10,7 @@ import com.innowise.taxi.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
@@ -65,6 +66,16 @@ public class UserServiceImpl implements UserService {
         }
         default -> throw new ServiceException("Registration failed", e);
       };
+    }
+  }
+
+  @Override
+  public List<User> findAllUsers() throws ServiceException {
+    try {
+      return userDaoImpl.findAll();
+    } catch (DaoException e) {
+      logger.error("Service error while finding all users", e);
+      throw new ServiceException(e);
     }
   }
 

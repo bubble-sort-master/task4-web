@@ -1,4 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%
+  response.setHeader("Cache-Control", "no-store");
+  response.setHeader("Pragma", "no-cache");
+  response.setHeader("Expires", "0");
+  response.setDateHeader("Expires", -1);
+%>
 <html>
 <head>
   <title>Driver Main</title>

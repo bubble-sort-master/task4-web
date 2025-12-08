@@ -1,6 +1,7 @@
 package com.innowise.taxi.dao.impl;
 import com.innowise.taxi.dao.UserDao;
 import com.innowise.taxi.dao.constant.UserColumn;
+import com.innowise.taxi.entity.Role;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoErrorCode;
 import com.innowise.taxi.exception.DaoException;
@@ -8,14 +9,23 @@ import com.innowise.taxi.pool.ConnectionPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
   private static final Logger logger = LogManager.getLogger();
-  private static final String SELECT_BY_USERNAME = "SELECT id, username, password, role, first_name, last_name FROM users WHERE username = ?";
+  private static final String SELECT_BY_USERNAME ="""
+    SELECT id, username, password, role, first_name, last_name, bonus_points, is_banned
+    FROM users WHERE username = ?
+    """;
   private static final String INSERT_USER = """
     INSERT INTO users (username, password, first_name, last_name)
     VALUES (?, ?, ?, ?)
+    """;
+  private static final String SELECT_ALL_USERS = """
+    SELECT id, username, password, role, first_name, last_name, bonus_points, is_banned
+    FROM users
     """;
 
   @Override
@@ -31,9 +41,11 @@ public class UserDaoImpl implements UserDao {
                     result.getLong(UserColumn.ID),
                     result.getString(UserColumn.USERNAME),
                     result.getString(UserColumn.PASSWORD),
-                    result.getString(UserColumn.ROLE),
+                    Role.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
                     result.getString(UserColumn.FIRST_NAME),
-                    result.getString(UserColumn.LAST_NAME)
+                    result.getString(UserColumn.LAST_NAME),
+                    result.getInt(UserColumn.BONUS_POINTS),
+                    result.getBoolean(UserColumn.BANNED)
             );
             logger.info("User {} found in database", username);
             return Optional.of(user);
@@ -77,5 +89,37 @@ public class UserDaoImpl implements UserDao {
     } finally {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
+  }
+
+  @Override
+  public List<User> findAll() throws DaoException {
+    List<User> users = new ArrayList<>();
+    Connection connection = null;
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+      try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_USERS);
+           ResultSet result = statement.executeQuery()) {
+        while (result.next()) {
+          User user = new User(
+                  result.getLong(UserColumn.ID),
+                  result.getString(UserColumn.USERNAME),
+                  result.getString(UserColumn.PASSWORD),
+                  Role.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
+                  result.getString(UserColumn.FIRST_NAME),
+                  result.getString(UserColumn.LAST_NAME),
+                  result.getInt(UserColumn.BONUS_POINTS),
+                  result.getBoolean(UserColumn.BANNED)
+          );
+
+          users.add(user);
+        }
+      }
+    } catch (SQLException e) {
+      logger.error("Error while finding all users", e);
+      throw new DaoException(e);
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
+    return users;
   }
 }
