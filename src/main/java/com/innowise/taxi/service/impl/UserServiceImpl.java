@@ -1,7 +1,5 @@
 package com.innowise.taxi.service.impl;
 
-import com.innowise.taxi.auth.AuthResult;
-import com.innowise.taxi.auth.AuthResultType;
 import com.innowise.taxi.dao.impl.UserDaoImpl;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoException;
@@ -25,27 +23,29 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public AuthResult authenticate(String username, String password) throws ServiceException {
+  public Optional<User> authenticate(String username, String password) throws ServiceException {
     try {
       Optional<User> userOptional = userDaoImpl.findByUsername(username);
-      if (userOptional.isEmpty()) {
-        logger.warn("Authentication failed: user {} not found", username);
-        return new AuthResult(AuthResultType.USER_NOT_FOUND, null);
-      }
 
-      User user = userOptional.get();
-      if (user.getPassword().equals(password)) {
-        logger.info("Authentication successful for user {}", username);
-        return new AuthResult(AuthResultType.SUCCESS, user);
+      if (userOptional.isPresent()) {
+        User user = userOptional.get();
+        if (user.getPassword().equals(password)) {
+          logger.info("Authentication successful for user {}", username);
+          return Optional.of(user);
+        } else {
+          logger.warn("Authentication failed for user {}: wrong password", username);
+          return Optional.empty();
+        }
       } else {
-        logger.warn("Authentication failed for user {}: wrong password", username);
-        return new AuthResult(AuthResultType.WRONG_PASSWORD, null);
+        logger.warn("Authentication failed: user {} not found", username);
+        return Optional.empty();
       }
     } catch (DaoException e) {
       logger.error("Service error during authentication for user {}", username, e);
       throw new ServiceException(e);
     }
   }
+
 
   @Override
   public boolean register(User user) throws ServiceException {

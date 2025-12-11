@@ -19,10 +19,8 @@ public enum CommandType {
         try {
             CommandType type = CommandType.valueOf(commandStr.toUpperCase());
             return type.command;
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException e) {
             return DEFAULT.command;
         }
     }
-
-
 }
