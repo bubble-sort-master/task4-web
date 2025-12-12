@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +18,11 @@
   <br/>
   ${login_err}
   ${default_err}
-  ${register_success}
+  <c:if test="${not empty sessionScope.register_success}">
+    <div style="color:green;">${sessionScope.register_success}</div>
+    <c:remove var="register_success" scope="session"/>
+  </c:if>
+
 </form>
 <br/>
 <a href="pages/register.jsp">Зарегистрироваться</a>

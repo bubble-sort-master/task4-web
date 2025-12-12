@@ -1,6 +1,5 @@
 package com.innowise.taxi.dao.impl;
 import com.innowise.taxi.dao.UserDao;
-import com.innowise.taxi.dao.constant.UserColumn;
 import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.DaoErrorCode;
@@ -38,14 +37,14 @@ public class UserDaoImpl implements UserDao {
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
             User user = new User(
-                    result.getLong(UserColumn.ID),
-                    result.getString(UserColumn.USERNAME),
-                    result.getString(UserColumn.PASSWORD),
-                    UserRole.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
-                    result.getString(UserColumn.FIRST_NAME),
-                    result.getString(UserColumn.LAST_NAME),
-                    result.getInt(UserColumn.BONUS_POINTS),
-                    result.getBoolean(UserColumn.BANNED)
+                    result.getLong(ID),
+                    result.getString(USERNAME),
+                    result.getString(PASSWORD),
+                    UserRole.valueOf(result.getString(ROLE).toUpperCase()),
+                    result.getString(FIRST_NAME),
+                    result.getString(LAST_NAME),
+                    result.getInt(BONUS_POINTS),
+                    result.getBoolean(BANNED)
             );
             logger.info("User {} found in database", username);
             return Optional.of(user);
@@ -101,14 +100,14 @@ public class UserDaoImpl implements UserDao {
            ResultSet result = statement.executeQuery()) {
         while (result.next()) {
           User user = new User(
-                  result.getLong(UserColumn.ID),
-                  result.getString(UserColumn.USERNAME),
-                  result.getString(UserColumn.PASSWORD),
-                  UserRole.valueOf(result.getString(UserColumn.ROLE).toUpperCase()),
-                  result.getString(UserColumn.FIRST_NAME),
-                  result.getString(UserColumn.LAST_NAME),
-                  result.getInt(UserColumn.BONUS_POINTS),
-                  result.getBoolean(UserColumn.BANNED)
+                  result.getLong(ID),
+                  result.getString(USERNAME),
+                  result.getString(PASSWORD),
+                  UserRole.valueOf(result.getString(ROLE).toUpperCase()),
+                  result.getString(FIRST_NAME),
+                  result.getString(LAST_NAME),
+                  result.getInt(BONUS_POINTS),
+                  result.getBoolean(BANNED)
           );
 
           users.add(user);

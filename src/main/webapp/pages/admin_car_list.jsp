@@ -8,7 +8,7 @@
 %>
 <html>
 <head>
-  <title>User List</title>
+  <title>Car List</title>
   <style>
       table {
           border-collapse: collapse;
@@ -26,35 +26,24 @@
   </style>
 </head>
 <body>
-<h2 style="text-align:center;">All Users</h2>
+<h2 style="text-align:center;">All Cars</h2>
 
 <table>
   <thead>
   <tr>
     <th>ID</th>
-    <th>Username</th>
-    <th>First Name</th>
-    <th>Last Name</th>
-    <th>Role</th>
-    <th>Bonus Points</th>
-    <th>Banned</th>
+    <th>Model</th>
+    <th>Plate Number</th>
+    <th>Year</th>
   </tr>
   </thead>
   <tbody>
-  <c:forEach var="user" items="${users}">
+  <c:forEach var="car" items="${cars}">
     <tr>
-      <td>${user.id}</td>
-      <td>${user.username}</td>
-      <td>${user.firstName}</td>
-      <td>${user.lastName}</td>
-      <td>${user.role}</td>
-      <td>${user.bonusPoints}</td>
-      <td>
-        <c:choose>
-          <c:when test="${user.banned}">Yes</c:when>
-          <c:otherwise>No</c:otherwise>
-        </c:choose>
-      </td>
+      <td>${car.id}</td>
+      <td>${car.model}</td>
+      <td>${car.plateNumber}</td>
+      <td>${car.year}</td>
     </tr>
   </c:forEach>
   </tbody>

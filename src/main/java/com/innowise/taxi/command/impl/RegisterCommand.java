@@ -43,8 +43,9 @@ public class RegisterCommand implements Command {
       boolean registered = userService.register(user);
       if (registered) {
         logger.info("User {} registered successfully", username);
-        session.setAttribute(AttributeName.REGISTER_SUCCESS, "Registration successful, please login");
-
+        session.invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute(AttributeName.REGISTER_SUCCESS, "Registration successful, please login");
         page = PagePath.INDEX;
       } else {
         logger.warn("Registration failed for user {}", username);

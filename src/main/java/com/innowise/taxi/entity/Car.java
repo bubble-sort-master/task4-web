@@ -6,6 +6,13 @@ public class Car {
   private String plateNumber;
   private int year;
 
+  public Car(Long id, String model, String plateNumber, int year) {
+    this.id = id;
+    this.model = model;
+    this.plateNumber = plateNumber;
+    this.year = year;
+  }
+
   public Long getId() {
     return id;
   }

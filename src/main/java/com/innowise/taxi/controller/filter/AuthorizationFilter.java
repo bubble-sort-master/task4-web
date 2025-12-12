@@ -22,22 +22,28 @@ import java.util.Set;
 public class AuthorizationFilter implements Filter {
   private static final Logger logger = LogManager.getLogger();
 
+  private static final Map<UserRole, String> roleMainPage = new HashMap<>();
+
   private static final Map<UserRole, Set<String>> rolePages = new HashMap<>();
   private static final Map<UserRole, Set<String>> roleCommands = new HashMap<>();
-  private static final Set<String> publicPages = Set.of(PagePath.INDEX, PagePath.REGISTER);
+
+  private static final Set<String> publicPages = Set.of(PagePath.INDEX);
   private static final Set<String> publicCommands = Set.of(
-          CommandType.LOGIN.name(),
-          CommandType.REGISTER.name(),
           CommandType.LOGOUT.name()
   );
 
   static {
+    roleMainPage.put(UserRole.CLIENT, PagePath.CLIENT_MAIN);
+    roleMainPage.put(UserRole.DRIVER, PagePath.DRIVER_MAIN);
+    roleMainPage.put(UserRole.ADMIN, PagePath.ADMIN_MAIN);
+
     rolePages.put(UserRole.CLIENT, Set.of(PagePath.CLIENT_MAIN));
     rolePages.put(UserRole.DRIVER, Set.of(PagePath.DRIVER_MAIN));
-    rolePages.put(UserRole.ADMIN, Set.of(PagePath.ADMIN_MAIN,  PagePath.ADMIN_USER_LIST));
+    rolePages.put(UserRole.ADMIN, Set.of(PagePath.ADMIN_MAIN, PagePath.ADMIN_USER_LIST, PagePath.ADMIN_CAR_LIST));
 
     roleCommands.put(UserRole.ADMIN, Set.of(
-            CommandType.SHOW_USERS.name()
+            CommandType.SHOW_USERS.name(),
+            CommandType.SHOW_CARS.name()
     ));
   }
 
@@ -56,14 +62,16 @@ public class AuthorizationFilter implements Filter {
       UserRole role = (UserRole) session.getAttribute(AttributeName.ROLE);
       Set<String> allowedPages = rolePages.getOrDefault(role, Set.of());
       Set<String> allowedCommands = roleCommands.getOrDefault(role, Set.of());
+      String mainPage = roleMainPage.getOrDefault(role, PagePath.INDEX);
 
-      if (uri.endsWith(PagePath.INDEX)) {
-        if (!allowedPages.isEmpty()) {
-          String mainPage = allowedPages.iterator().next();
-          httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
-          return;
-        }
+      if (uri.endsWith(PagePath.INDEX)
+              || uri.endsWith(PagePath.REGISTER)
+              || (command != null && (command.equalsIgnoreCase(CommandType.LOGIN.name())
+              || command.equalsIgnoreCase(CommandType.REGISTER.name())))) {
+        httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
+        return;
       }
+
 
       boolean allowed = allowedPages.stream().anyMatch(uri::endsWith)
               || publicPages.stream().anyMatch(uri::endsWith)
@@ -72,7 +80,6 @@ public class AuthorizationFilter implements Filter {
 
       if (!allowed) {
         logger.warn("Access denied: role {} tried to access {}", role, uri);
-        String mainPage = allowedPages.isEmpty() ? PagePath.INDEX : allowedPages.iterator().next();
         httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
         return;
       }
@@ -81,5 +88,3 @@ public class AuthorizationFilter implements Filter {
     chain.doFilter(request, response);
   }
 }
-
-

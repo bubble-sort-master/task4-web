@@ -22,6 +22,10 @@
   <input type="hidden" name="command" value="show_users"/>
   <input type="submit" value="Show All Users"/>
 </form>
+<form action="${pageContext.request.contextPath}/controller" method="get">
+  <input type="hidden" name="command" value="show_cars"/>
+  <input type="submit" value="Show All Cars"/>
+</form>
 
 <p style="color:red;">${admin_err}</p>
 </body>

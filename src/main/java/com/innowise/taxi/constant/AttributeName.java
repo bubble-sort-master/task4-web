@@ -15,6 +15,7 @@ public class AttributeName {
   public static final String BONUS_POINTS = "bonusPoints";
   public static final String BANNED = "banned";
   public static final String USERS = "users";
+  public static final String CARS = "cars";
 
   private AttributeName(){}
 }
