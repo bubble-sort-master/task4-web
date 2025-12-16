@@ -1,7 +1,7 @@
 package com.innowise.taxi.entity;
 
 public class User {
-  private Long id;
+  private int id;
   private final String username;
   private final String password;
   private final String firstName;
@@ -17,7 +17,7 @@ public class User {
     this.lastName = lastName;
   }
 
-  public User(long id, String username, String password, UserRole role, String firstName, String lastName, int bonusPoints, boolean banned) {
+  public User(int id, String username, String password, UserRole role, String firstName, String lastName, int bonusPoints, boolean banned) {
     this.id = id;
     this.username = username;
     this.password = password;
@@ -52,5 +52,5 @@ public class User {
 
   public int getBonusPoints() {return bonusPoints;}
 
-  public Long getId() {return id;}
+  public int getId() {return id;}
 }

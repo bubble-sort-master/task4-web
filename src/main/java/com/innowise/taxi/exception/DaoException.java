@@ -8,13 +8,13 @@ public class DaoException extends Exception {
     this.errorCode = errorCode;
   }
 
-  public DaoException(String message, DaoErrorCode errorCode) {
-    super(message);
-    this.errorCode = errorCode;
-  }
-
   public DaoException(Throwable cause) {
     super(cause);
+    this.errorCode = DaoErrorCode.UNKNOWN;
+  }
+
+  public DaoException(String message) {
+    super(message);
     this.errorCode = DaoErrorCode.UNKNOWN;
   }
 

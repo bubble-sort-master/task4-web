@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CarServiceImpl implements CarService {
   private static final Logger logger = LogManager.getLogger();
@@ -31,5 +32,24 @@ public class CarServiceImpl implements CarService {
       throw new ServiceException(e);
     }
   }
+
+  @Override
+  public Car findById(int id) throws ServiceException {
+    try {
+      return carDaoImpl.findById(id);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
+  }
+
+  @Override
+  public Optional<Car> findFreeCar() throws ServiceException {
+    try {
+      return carDaoImpl.findFreeCar();
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
+  }
+
 
 }

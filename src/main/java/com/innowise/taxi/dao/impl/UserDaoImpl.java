@@ -37,7 +37,7 @@ public class UserDaoImpl implements UserDao {
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
             User user = new User(
-                    result.getLong(ID),
+                    result.getInt(ID),
                     result.getString(USERNAME),
                     result.getString(PASSWORD),
                     UserRole.valueOf(result.getString(ROLE).toUpperCase()),
@@ -100,7 +100,7 @@ public class UserDaoImpl implements UserDao {
            ResultSet result = statement.executeQuery()) {
         while (result.next()) {
           User user = new User(
-                  result.getLong(ID),
+                  result.getInt(ID),
                   result.getString(USERNAME),
                   result.getString(PASSWORD),
                   UserRole.valueOf(result.getString(ROLE).toUpperCase()),

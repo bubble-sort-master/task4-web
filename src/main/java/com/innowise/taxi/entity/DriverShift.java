@@ -3,24 +3,35 @@ package com.innowise.taxi.entity;
 import java.time.LocalDateTime;
 
 public class DriverShift{
-  private Long id;
-  private Long driverId;
-  private Long carId;
+  private int id;
+  private int driverId;
+  private int carId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private DriverShiftStatus status;
   private int currentLat;
   private int currentLon;
 
-  public Long getId() {
+  public DriverShift(int id, int driverId, int carId, LocalDateTime startTime, LocalDateTime endTime, DriverShiftStatus status, int currentLat, int currentLon) {
+    this.id = id;
+    this.driverId = driverId;
+    this.carId = carId;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.status = status;
+    this.currentLat = currentLat;
+    this.currentLon = currentLon;
+  }
+
+  public int getId() {
     return id;
   }
 
-  public Long getDriverId() {
+  public int getDriverId() {
     return driverId;
   }
 
-  public Long getCarId() {
+  public int getCarId() {
     return carId;
   }
 

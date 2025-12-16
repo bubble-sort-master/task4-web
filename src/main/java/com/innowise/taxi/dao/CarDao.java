@@ -4,6 +4,7 @@ import com.innowise.taxi.entity.Car;
 import com.innowise.taxi.exception.DaoException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CarDao {
   String ID = "id";
@@ -11,5 +12,7 @@ public interface CarDao {
   String PLATE_NUMBER = "plate_number";
   String YEAR = "year";
 
-  public List<Car> findAll() throws DaoException;
+  List<Car> findAll() throws DaoException;
+  Car findById(int Id) throws DaoException;
+  Optional<Car> findFreeCar() throws DaoException;
 }

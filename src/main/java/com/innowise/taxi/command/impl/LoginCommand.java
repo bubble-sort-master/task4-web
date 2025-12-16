@@ -5,10 +5,16 @@ import com.innowise.taxi.command.Router;
 import com.innowise.taxi.constant.AttributeName;
 import com.innowise.taxi.constant.PagePath;
 import com.innowise.taxi.constant.ParameterName;
+import com.innowise.taxi.entity.Car;
+import com.innowise.taxi.entity.DriverShift;
 import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.entity.User;
 import com.innowise.taxi.exception.ServiceException;
+import com.innowise.taxi.service.CarService;
+import com.innowise.taxi.service.DriverShiftService;
 import com.innowise.taxi.service.UserService;
+import com.innowise.taxi.service.impl.CarServiceImpl;
+import com.innowise.taxi.service.impl.DriverShiftServiceImpl;
 import com.innowise.taxi.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -45,7 +51,10 @@ public class LoginCommand implements Command {
 
         switch (role) {
           case CLIENT -> page = PagePath.CLIENT_MAIN;
-          case DRIVER -> page = PagePath.DRIVER_MAIN;
+          case DRIVER -> {
+            handleDriverLogin(user, session);
+            page = PagePath.DRIVER_MAIN;
+          }
           case ADMIN -> page = PagePath.ADMIN_MAIN;
           default -> page = PagePath.INDEX;
         }
@@ -60,6 +69,22 @@ public class LoginCommand implements Command {
     }
 
     return new Router(page, Router.TransitionType.REDIRECT);
+  }
+
+  private void handleDriverLogin(User user, HttpSession session) throws ServiceException {
+    DriverShiftService shiftService = DriverShiftServiceImpl.getInstance();
+    Optional<DriverShift> activeShift = shiftService.findActiveDriverShift(user.getId());
+    if (activeShift.isPresent()) {
+      DriverShift shift = activeShift.get();
+      CarService carService = CarServiceImpl.getInstance();
+      Car car = carService.findById(shift.getCarId());
+      session.setAttribute(AttributeName.DRIVER_SHIFT_ACTIVE, true);
+      session.setAttribute(AttributeName.SHIFT_START_TIME, shift.getStartTime());
+      session.setAttribute(AttributeName.CAR_MODEL, car.getModel());
+      session.setAttribute(AttributeName.CAR_PLATE_NUMBER, car.getPlateNumber());
+    } else {
+      session.setAttribute(AttributeName.DRIVER_SHIFT_ACTIVE, false);
+    }
   }
 
 }

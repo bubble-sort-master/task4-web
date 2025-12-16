@@ -8,7 +8,8 @@ public enum CommandType {
     LOGOUT(new LogoutCommand()),
     DEFAULT(new DefaultCommand()),
     SHOW_USERS(new ShowUsersCommand()),
-    SHOW_CARS(new ShowCarsCommand());
+    SHOW_CARS(new ShowCarsCommand()),
+    DRIVER_SHIFT(new DriverShiftCommand());
 
     final Command command;
 

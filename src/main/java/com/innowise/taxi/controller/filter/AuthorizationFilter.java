@@ -45,6 +45,9 @@ public class AuthorizationFilter implements Filter {
             CommandType.SHOW_USERS.name(),
             CommandType.SHOW_CARS.name()
     ));
+    roleCommands.put(UserRole.DRIVER, Set.of(
+            CommandType.DRIVER_SHIFT.name()
+    ));
   }
 
   @Override
