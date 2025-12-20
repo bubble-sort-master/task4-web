@@ -9,28 +9,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class DriverShiftDaoImpl implements DriverShiftDao {
   private static final Logger logger = LogManager.getLogger();
-
   private static final String SELECT_ACTIVE_BY_DRIVER = """
         SELECT id, driver_id, car_id, start_time, end_time, status, current_lat, current_lon
         FROM driver_shifts
         WHERE driver_id = ? AND status = 'ACTIVE'
         LIMIT 1
     """;
-
   private static final String UPDATE_STATUS_TO_CLOSED = """
         UPDATE driver_shifts
         SET status = 'CLOSED', end_time = NOW()
         WHERE id = ?
     """;
-
-  private static final String INSERT_SHIFT = """
-        INSERT INTO driver_shifts(driver_id, car_id, start_time, status)
-        VALUES (?, ?, NOW(), 'ACTIVE')
+  private static final String SQL_INSERT_SHIFT = """
+    INSERT INTO driver_shifts (driver_id, car_id, start_time, status)
+    SELECT ?, c.id, NOW(), 'ACTIVE'
+    FROM cars c
+    WHERE c.id NOT IN (
+        SELECT car_id FROM driver_shifts WHERE status = 'ACTIVE'
+    )
+    LIMIT 1
+    """;
+  private static final String SQL_SELECT_SHIFT_BY_ID = """
+    SELECT id, driver_id, car_id, start_time, end_time, status, current_lat, current_lon
+    FROM driver_shifts
+    WHERE id = ?
     """;
 
   @Override
@@ -74,32 +80,52 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
     }
   }
 
-
   @Override
-  public DriverShift insertShift(int driverId, int carId) throws DaoException {
+  public Optional<DriverShift> findById(int shiftId) throws DaoException {
     Connection connection = null;
     try {
       connection = ConnectionPool.getInstance().getConnection();
-      try (PreparedStatement statement = connection.prepareStatement(INSERT_SHIFT, Statement.RETURN_GENERATED_KEYS)) {
-        statement.setInt(1, driverId);
-        statement.setInt(2, carId);
-        statement.executeUpdate();
-
-        try (ResultSet keys = statement.getGeneratedKeys()) {
-          if (keys.next()) {
-            int id = keys.getInt(1);
-            return new DriverShift(id, driverId, carId,
-                    LocalDateTime.now(), null, DriverShiftStatus.ACTIVE, 0, 0);
+      try (PreparedStatement statement = connection.prepareStatement(SQL_SELECT_SHIFT_BY_ID)) {
+        statement.setInt(1, shiftId);
+        try (ResultSet rs = statement.executeQuery()) {
+          if (rs.next()) {
+            return Optional.of(mapRow(rs));
           }
         }
       }
     } catch (SQLException e) {
-      logger.error("Error inserting new shift for driver {}", driverId, e);
       throw new DaoException(e);
     } finally {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
-    throw new DaoException("Failed to insert shift");
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<Integer> insertShift(int driverId) throws DaoException {
+    Connection connection = null;
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+      try (PreparedStatement ps = connection.prepareStatement(SQL_INSERT_SHIFT, Statement.RETURN_GENERATED_KEYS)) {
+        ps.setInt(1, driverId);
+        int affected = ps.executeUpdate();
+        if (affected == 0) {
+          return Optional.empty();
+        }
+        try (ResultSet keys = ps.getGeneratedKeys()) {
+          if (keys.next()) {
+            return Optional.of(keys.getInt(1));
+          }
+        }
+      }
+    } catch (SQLIntegrityConstraintViolationException e) {
+      return Optional.empty();
+    } catch (SQLException e) {
+      throw new DaoException(e);
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
+    return Optional.empty();
   }
 
   private DriverShift mapRow(ResultSet rs) throws SQLException {

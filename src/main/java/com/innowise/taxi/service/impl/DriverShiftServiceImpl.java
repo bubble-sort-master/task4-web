@@ -2,19 +2,22 @@ package com.innowise.taxi.service.impl;
 
 import com.innowise.taxi.dao.DriverShiftDao;
 import com.innowise.taxi.dao.impl.DriverShiftDaoImpl;
-import com.innowise.taxi.entity.Car;
 import com.innowise.taxi.entity.DriverShift;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.CarService;
 import com.innowise.taxi.service.DriverShiftService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.sql.SQLTransactionRollbackException;
 import java.util.Optional;
 
 public class DriverShiftServiceImpl implements DriverShiftService {
   private static final DriverShiftServiceImpl instance = new DriverShiftServiceImpl();
   private final DriverShiftDao driverShiftDao = new DriverShiftDaoImpl();
-  private final CarService carService = CarServiceImpl.getInstance();
+  private static final int MAX_RETRIES = 5;
+  private static final Logger logger = LogManager.getLogger();
 
   private DriverShiftServiceImpl() {}
 
@@ -33,17 +36,25 @@ public class DriverShiftServiceImpl implements DriverShiftService {
 
   @Override
   public Optional<DriverShift> startDriverShift(int userId) throws ServiceException {
-    try {
-      Optional<Car> freeCar = carService.findFreeCar();
-      if (freeCar.isPresent()) {
-        Car car = freeCar.get();
-        DriverShift shift = driverShiftDao.insertShift(userId, car.getId());
-        return Optional.of(shift);
+    int attempt = 0;
+    while (attempt < MAX_RETRIES) {
+      try {
+        Optional<Integer> shiftIdOptional = driverShiftDao.insertShift(userId);
+        if (shiftIdOptional.isEmpty()) {
+          return Optional.empty();
+        }
+        return driverShiftDao.findById(shiftIdOptional.get());
+      } catch (DaoException e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof SQLTransactionRollbackException) {
+          attempt++;
+          logger.warn("Deadlock detected for driver {}. Retrying {}/{}", userId, attempt, MAX_RETRIES);
+          continue;
+        }
+        throw new ServiceException(e);
       }
-      return Optional.empty();
-    } catch (DaoException e) {
-      throw new ServiceException(e);
     }
+    return Optional.empty();
   }
 
   @Override

@@ -17,5 +17,6 @@ public interface DriverShiftDao {
 
   Optional<DriverShift> findActiveByDriverId(int driverId) throws DaoException;
   boolean updateStatusToClosed(int shiftId) throws DaoException;
-  DriverShift insertShift(int driverId, int carId)   throws DaoException;
+  Optional<DriverShift> findById(int shiftId) throws DaoException;
+  Optional<Integer> insertShift(int driverId) throws DaoException;
 }
