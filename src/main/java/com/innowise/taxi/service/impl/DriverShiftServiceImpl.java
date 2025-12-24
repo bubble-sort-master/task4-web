@@ -3,14 +3,12 @@ package com.innowise.taxi.service.impl;
 import com.innowise.taxi.dao.DriverShiftDao;
 import com.innowise.taxi.dao.impl.DriverShiftDaoImpl;
 import com.innowise.taxi.entity.DriverShift;
+import com.innowise.taxi.exception.DaoErrorCode;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
-import com.innowise.taxi.service.CarService;
 import com.innowise.taxi.service.DriverShiftService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.sql.SQLTransactionRollbackException;
 import java.util.Optional;
 
 public class DriverShiftServiceImpl implements DriverShiftService {
@@ -45,8 +43,7 @@ public class DriverShiftServiceImpl implements DriverShiftService {
         }
         return driverShiftDao.findById(shiftIdOptional.get());
       } catch (DaoException e) {
-        Throwable cause = e.getCause();
-        if (cause instanceof SQLTransactionRollbackException) {
+        if (e.getErrorCode() == DaoErrorCode.DEADLOCK) {
           attempt++;
           logger.warn("Deadlock detected for driver {}. Retrying {}/{}", userId, attempt, MAX_RETRIES);
           continue;

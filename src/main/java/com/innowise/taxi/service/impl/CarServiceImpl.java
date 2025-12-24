@@ -1,7 +1,6 @@
 package com.innowise.taxi.service.impl;
 
 import com.innowise.taxi.dao.impl.CarDaoImpl;
-import com.innowise.taxi.dao.impl.UserDaoImpl;
 import com.innowise.taxi.entity.Car;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
