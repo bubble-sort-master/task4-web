@@ -21,6 +21,10 @@ public class AttributeName {
   public static final String SHIFT_START_TIME = "shift_start_time";
   public static final String CAR_MODEL = "car_model";
   public static final String CAR_PLATE_NUMBER = "car_plate_number";
+  public static final String CLIENT_LATITUDE = "client_latitude";
+  public static final String CLIENT_LONGITUDE = "client_longitude";
+  public static final String DRIVER_LATITUDE = "driver_latitude";
+  public static final String DRIVER_LONGITUDE = "driver_longitude";
 
   private AttributeName(){}
 }

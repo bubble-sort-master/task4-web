@@ -18,6 +18,7 @@
 <c:if test="${driver_shift_active}">
   <p>Work shift started at: ${shift_start_time}</p>
   <p>Your car: ${car_model} (${car_plate})</p>
+  <p>Your current location: (${driver_latitude};${driver_longitude})</p>
 </c:if>
 
 <br/>

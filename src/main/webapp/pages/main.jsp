@@ -12,7 +12,8 @@
 <body>
 <h2>Welcome, ${firstName} ${lastName} (CLIENT)</h2>
 <p>Username: ${username}</p>
-
+<br/><br/>
+<p>Your current location: (${client_latitude};${client_longitude})</p>
 <br/><br/>
 <form action="${pageContext.request.contextPath}/controller">
   <input type="hidden" name="command" value="logout"/>

@@ -16,6 +16,7 @@ import com.innowise.taxi.service.UserService;
 import com.innowise.taxi.service.impl.CarServiceImpl;
 import com.innowise.taxi.service.impl.DriverShiftServiceImpl;
 import com.innowise.taxi.service.impl.UserServiceImpl;
+import com.innowise.taxi.util.LocationGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.servlet.http.HttpSession;
@@ -44,13 +45,15 @@ public class LoginCommand implements Command {
         session.setAttribute(AttributeName.USERNAME, user.getUsername());
         session.setAttribute(AttributeName.FIRST_NAME, user.getFirstName());
         session.setAttribute(AttributeName.LAST_NAME, user.getLastName());
-        session.setAttribute(AttributeName.BONUS_POINTS, user.getBonusPoints());
         session.setAttribute(AttributeName.BANNED, user.isBanned());
         UserRole role = user.getRole();
         session.setAttribute(AttributeName.ROLE, role);
 
         switch (role) {
-          case CLIENT -> page = PagePath.CLIENT_MAIN;
+          case CLIENT -> {
+            handleClientLogin(user, session);
+            page = PagePath.CLIENT_MAIN;
+          }
           case DRIVER -> {
             handleDriverLogin(user, session);
             page = PagePath.DRIVER_MAIN;
@@ -71,6 +74,13 @@ public class LoginCommand implements Command {
     return new Router(page, Router.TransitionType.REDIRECT);
   }
 
+  private void handleClientLogin(User user, HttpSession session) {
+    session.setAttribute(AttributeName.BONUS_POINTS, user.getBonusPoints());
+
+    session.setAttribute(AttributeName.CLIENT_LATITUDE, LocationGenerator.nextLatitude());
+    session.setAttribute(AttributeName.CLIENT_LONGITUDE, LocationGenerator.nextLongitude());
+  }
+
   private void handleDriverLogin(User user, HttpSession session) throws ServiceException {
     DriverShiftService shiftService = DriverShiftServiceImpl.getInstance();
     Optional<DriverShift> activeShift = shiftService.findActiveDriverShift(user.getId());
@@ -82,6 +92,8 @@ public class LoginCommand implements Command {
       session.setAttribute(AttributeName.SHIFT_START_TIME, shift.getStartTime());
       session.setAttribute(AttributeName.CAR_MODEL, car.getModel());
       session.setAttribute(AttributeName.CAR_PLATE_NUMBER, car.getPlateNumber());
+      session.setAttribute(AttributeName.DRIVER_LATITUDE, shift.getCurrentLat());
+      session.setAttribute(AttributeName.DRIVER_LONGITUDE, shift.getCurrentLon());
     } else {
       session.setAttribute(AttributeName.DRIVER_SHIFT_ACTIVE, false);
     }

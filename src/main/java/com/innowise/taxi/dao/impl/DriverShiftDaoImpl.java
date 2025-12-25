@@ -5,6 +5,7 @@ import com.innowise.taxi.entity.DriverShift;
 import com.innowise.taxi.entity.DriverShiftStatus;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.pool.ConnectionPool;
+import com.innowise.taxi.util.LocationGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,8 +26,8 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
         WHERE id = ?
     """;
   private static final String SQL_INSERT_SHIFT = """
-    INSERT INTO driver_shifts (driver_id, car_id, start_time, status)
-    SELECT ?, c.id, NOW(), 'ACTIVE'
+    INSERT INTO driver_shifts (driver_id, car_id, start_time, current_lat, current_lon)
+    SELECT ?, c.id, NOW(), ?, ?
     FROM cars c
     WHERE c.id NOT IN (
         SELECT car_id FROM driver_shifts WHERE status = 'ACTIVE'
@@ -107,7 +108,13 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
     try {
       connection = ConnectionPool.getInstance().getConnection();
       try (PreparedStatement ps = connection.prepareStatement(SQL_INSERT_SHIFT, Statement.RETURN_GENERATED_KEYS)) {
+        int latitude = LocationGenerator.nextLatitude();
+        int longitude = LocationGenerator.nextLongitude();
+
         ps.setInt(1, driverId);
+        ps.setInt(2, latitude);
+        ps.setInt(3, longitude);
+
         int affected = ps.executeUpdate();
         if (affected == 0) {
           return Optional.empty();
@@ -127,6 +134,7 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
     }
     return Optional.empty();
   }
+
 
   private DriverShift mapRow(ResultSet rs) throws SQLException {
     return new DriverShift(
