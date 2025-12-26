@@ -9,6 +9,7 @@
 <html>
 <head>
   <title>Driver Main</title>
+  <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <h2>Welcome, ${firstName} ${lastName} (DRIVER)</h2>
@@ -17,15 +18,33 @@
 <br/>
 <c:if test="${driver_shift_active}">
   <p>Work shift started at: ${shift_start_time}</p>
-  <p>Your car: ${car_model} (${car_plate})</p>
+  <p>Your car: ${car_model} (${car_plate_number})</p>
   <p>Your current location: (${driver_latitude};${driver_longitude})</p>
+
+    <div class="location-map">
+      <div class="location-cell"></div>
+      <c:forEach var="col" begin="0" end="7">
+        <div class="location-cell">${col}</div>
+      </c:forEach>
+
+      <c:forEach var="row" begin="0" end="7">
+        <div class="location-cell">${row}</div>
+        <c:forEach var="col" begin="0" end="7">
+          <div class="location-cell">
+            <c:if test="${row == driver_latitude && col == driver_longitude}">
+              <img src="${pageContext.request.contextPath}/images/current_location.png" alt="Driver location">
+            </c:if>
+          </div>
+        </c:forEach>
+      </c:forEach>
+    </div>
+
 </c:if>
 
 <br/>
 <form action="${pageContext.request.contextPath}/controller" method="post">
   <input type="hidden" name="command" value="driver_shift"/>
-  <input type="submit"
-         value="${driver_shift_active ? 'End shift' : 'Start shift'}"/>
+  <input type="submit" value="${driver_shift_active ? 'End shift' : 'Start shift'}"/>
 </form>
 
 <br/><br/>

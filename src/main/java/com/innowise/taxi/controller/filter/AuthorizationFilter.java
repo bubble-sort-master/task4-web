@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/*"})
+@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/controller/*", "/pages/*"})
 public class AuthorizationFilter implements Filter {
   private static final Logger logger = LogManager.getLogger();
 
