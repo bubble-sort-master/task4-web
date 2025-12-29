@@ -35,6 +35,25 @@
     </c:forEach>
   </c:forEach>
 </div>
+<br/>
+<!-- Форма для создания заказа -->
+<form action="${pageContext.request.contextPath}/controller" method="post">
+  <input type="hidden" name="command" value="client_order"/>
+  <input type="hidden" name="action" value="create"/>
+
+  <!-- pickup координаты берём из сессии -->
+  <input type="hidden" name="pickupLat" value="${client_latitude}"/>
+  <input type="hidden" name="pickupLon" value="${client_longitude}"/>
+
+  <!-- dropoff координаты вводит пользователь -->
+  <label for="dropoffLat">Dropoff Latitude:</label>
+  <input type="text" id="dropoffLat" name="dropoffLat" required/>
+
+  <label for="dropoffLon">Dropoff Longitude:</label>
+  <input type="text" id="dropoffLon" name="dropoffLon" required/>
+
+  <input type="submit" value="Create Order"/>
+</form>
 
 <br/>
 <form action="${pageContext.request.contextPath}/controller">

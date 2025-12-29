@@ -48,6 +48,9 @@ public class AuthorizationFilter implements Filter {
     roleCommands.put(UserRole.DRIVER, Set.of(
             CommandType.DRIVER_SHIFT.name()
     ));
+    roleCommands.put(UserRole.CLIENT, Set.of(
+            CommandType.CLIENT_ORDER.name()
+    ));
   }
 
   @Override

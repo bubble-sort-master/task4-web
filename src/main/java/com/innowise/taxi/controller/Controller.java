@@ -5,6 +5,7 @@ import java.io.*;
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.CommandType;
 import com.innowise.taxi.command.Router;
+import com.innowise.taxi.constant.ResponseContent;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -33,10 +34,18 @@ public class Controller extends HttpServlet {
     Command command = CommandType.parse(commandStr);
     Router router = command.execute(request);
 
-    if (router.getType() == Router.TransitionType.FORWARD) {
-      request.getRequestDispatcher(router.getPage()).forward(request, response);
-    } else {
-      response.sendRedirect(request.getContextPath() + "/" + router.getPage());
+    switch (router.getType()) {
+      case FORWARD:
+        request.getRequestDispatcher(router.getContent()).forward(request, response);
+        break;
+      case REDIRECT:
+        response.sendRedirect(request.getContextPath() + "/" + router.getContent());
+        break;
+      case DATA:
+        response.setContentType(ResponseContent.APPLICATION_JSON);
+        response.setCharacterEncoding(ResponseContent.UTF8);
+        response.getWriter().write(router.getContent());
+        break;
     }
   }
 
