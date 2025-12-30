@@ -14,17 +14,16 @@ import java.util.Optional;
 
 public class OrderDaoImpl implements OrderDao {
   private static final Logger logger = LogManager.getLogger(OrderDaoImpl.class);
-
   private static final String INSERT_SQL = """
-          INSERT INTO orders (client_id, pickup_lat, pickup_lon, dropoff_lat, dropoff_lon, price, status, is_paid)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          """;
+    INSERT INTO orders (client_id, driver_shift_id, pickup_lat, pickup_lon, dropoff_lat, dropoff_lon, price, status, is_paid)
+    VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)
+    """;
   private static final String FIND_BY_ID_SQL =
-          "SELECT * FROM orders WHERE id=?";
+    "SELECT * FROM orders WHERE id=?";
   private static final String UPDATE_STATUS_SQL =
-          "UPDATE orders SET status=? WHERE id=?";
+    "UPDATE orders SET status=? WHERE id=?";
   private static final String SET_DRIVER_SQL =
-          "UPDATE orders SET driver_shift_id=? WHERE id=?";
+    "UPDATE orders SET driver_shift_id=? WHERE id=?";
 
   @Override
   public Order insert(Order order) throws DaoException {
@@ -33,13 +32,14 @@ public class OrderDaoImpl implements OrderDao {
       connection = ConnectionPool.getInstance().getConnection();
       try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
         ps.setInt(1, order.getClientId());
-        ps.setInt(2, order.getPickupLat());
-        ps.setInt(3, order.getPickupLon());
-        ps.setInt(4, order.getDropOffLat());
-        ps.setInt(5, order.getDropOffLon());
-        ps.setDouble(6, order.getPrice());
-        ps.setString(7, order.getStatus().name());
-        ps.setBoolean(8, order.isPaid());
+        ps.setInt(2,order.getDriverShiftId());
+        ps.setInt(3, order.getPickupLat());
+        ps.setInt(4, order.getPickupLon());
+        ps.setInt(5, order.getDropOffLat());
+        ps.setInt(6, order.getDropOffLon());
+        ps.setDouble(7, order.getPrice());
+        ps.setString(8, order.getStatus().name());
+        ps.setBoolean(9, order.isPaid());
 
         ps.executeUpdate();
 

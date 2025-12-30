@@ -3,6 +3,7 @@ package com.innowise.taxi.dao;
 import com.innowise.taxi.entity.DriverShift;
 import com.innowise.taxi.exception.DaoException;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DriverShiftDao {
@@ -16,7 +17,8 @@ public interface DriverShiftDao {
   String CURRENT_LON = "current_lon";
 
   Optional<DriverShift> findActiveByDriverId(int driverId) throws DaoException;
-  boolean updateStatusToClosed(int shiftId) throws DaoException;
   Optional<DriverShift> findById(int shiftId) throws DaoException;
+  List<DriverShift> findActiveShifts() throws DaoException;
+  boolean updateStatusToClosed(int shiftId) throws DaoException;
   Optional<Integer> insertShift(int driverId) throws DaoException;
 }

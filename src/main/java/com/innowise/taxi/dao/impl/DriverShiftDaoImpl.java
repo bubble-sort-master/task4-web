@@ -10,6 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class DriverShiftDaoImpl implements DriverShiftDao {
@@ -38,6 +40,10 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
     SELECT id, driver_id, car_id, start_time, end_time, status, current_lat, current_lon
     FROM driver_shifts
     WHERE id = ?
+    """;
+  private static final String SQL_FIND_ACTIVE_SHIFTS = """
+    SELECT id, driver_id, car_id, start_time, end_time, status, current_lat, current_lon
+    FROM driver_shifts WHERE status = 'ACTIVE';
     """;
 
   @Override
@@ -135,6 +141,23 @@ public class DriverShiftDaoImpl implements DriverShiftDao {
     return Optional.empty();
   }
 
+  @Override
+  public List<DriverShift> findActiveShifts() throws DaoException {
+    List<DriverShift> shifts = new ArrayList<>();
+
+    try (Connection connection = ConnectionPool.getInstance().getConnection();
+         PreparedStatement ps = connection.prepareStatement(SQL_FIND_ACTIVE_SHIFTS)) {
+
+      ResultSet rs = ps.executeQuery();
+      while (rs.next()) {
+        shifts.add(mapRow(rs));
+      }
+    } catch (SQLException e) {
+      throw new DaoException(e);
+    }
+
+    return shifts;
+  }
 
   private DriverShift mapRow(ResultSet rs) throws SQLException {
     return new DriverShift(

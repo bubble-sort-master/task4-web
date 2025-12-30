@@ -31,29 +31,55 @@
         <c:if test="${row == client_latitude && col == client_longitude}">
           <img src="${pageContext.request.contextPath}/images/current_location.png" alt="You are here">
         </c:if>
+
+        <c:forEach var="driver" items="${nearest_drivers}">
+          <c:if test="${row == driver.latitude && col == driver.longitude}">
+            🚕
+          </c:if>
+        </c:forEach>
       </div>
     </c:forEach>
   </c:forEach>
 </div>
+<c:if test="${not empty avg_price}">
+  <p>Approximate cost: ${avg_price}</p>
+</c:if>
+<c:if test="${empty nearest_drivers}">
+  <p>No available cars</p>
+</c:if>
+
 <br/>
-<!-- Форма для создания заказа -->
 <form action="${pageContext.request.contextPath}/controller" method="post">
   <input type="hidden" name="command" value="client_order"/>
-  <input type="hidden" name="action" value="create"/>
+  <input type="hidden" name="action" value="search"/>
 
-  <!-- pickup координаты берём из сессии -->
   <input type="hidden" name="pickupLat" value="${client_latitude}"/>
   <input type="hidden" name="pickupLon" value="${client_longitude}"/>
 
-  <!-- dropoff координаты вводит пользователь -->
   <label for="dropoffLat">Dropoff Latitude:</label>
   <input type="text" id="dropoffLat" name="dropoffLat" required/>
 
   <label for="dropoffLon">Dropoff Longitude:</label>
   <input type="text" id="dropoffLon" name="dropoffLon" required/>
 
-  <input type="submit" value="Create Order"/>
+  <input type="submit" value="Search Nearest Cars"/>
 </form>
+
+<br/>
+
+<c:if test="${not empty avg_price}">
+  <form action="${pageContext.request.contextPath}/controller" method="post">
+    <input type="hidden" name="command" value="client_order"/>
+    <input type="hidden" name="action" value="create"/>
+
+    <input type="hidden" name="pickupLat" value="${client_latitude}"/>
+    <input type="hidden" name="pickupLon" value="${client_longitude}"/>
+    <input type="hidden" name="dropoffLat" value="${dropoffLat}"/>
+    <input type="hidden" name="dropoffLon" value="${dropoffLon}"/>
+
+    <input type="submit" value="Create Order"/>
+  </form>
+</c:if>
 
 <br/>
 <form action="${pageContext.request.contextPath}/controller">

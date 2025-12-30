@@ -27,6 +27,10 @@ public class AttributeName {
   public static final String CLIENT_LONGITUDE = "client_longitude";
   public static final String DRIVER_LATITUDE = "driver_latitude";
   public static final String DRIVER_LONGITUDE = "driver_longitude";
+  public static final String NEAREST_DRIVERS = "nearest_drivers";
+  public static final String AVG_PRICE = "avg_price";
+  public static final String DROPOFF_LAT = "dropoffLat";
+  public static final String DROPOFF_LON = "dropoffLon";
 
   private AttributeName(){}
 }
