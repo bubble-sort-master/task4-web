@@ -1,6 +1,7 @@
 package com.innowise.taxi.entity;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 public class Order{
   private int id;
@@ -12,39 +13,38 @@ public class Order{
   private int dropOffLat;
   private int dropOffLon;
   private LocalDateTime createdAt;
+  private boolean isPaid;
   private double price;
 
   public Order(int clientId, int pickupLat, int pickupLon, int dropOffLat, int dropOffLon, double price) {
+    this.id = 0;
     this.clientId = clientId;
     this.pickupLat = pickupLat;
     this.pickupLon = pickupLon;
     this.dropOffLat = dropOffLat;
     this.dropOffLon = dropOffLon;
     this.price = price;
+    this.isPaid = false;
+    this.createdAt = LocalDateTime.now();
+    this.driverShiftId = 0;
+    this.status = null;
+  }
+
+  public Order(int id, int clientId, int driverShiftId, OrderStatus status, int pickupLat,
+               int pickupLon,int dropOffLat, int dropOffLon, double price,
+               boolean paid, LocalDateTime createdAt) {
+    this(clientId, pickupLat, pickupLon, dropOffLat, dropOffLon, price);
+    this.id = id;
+    this.isPaid = paid;
+    this.status=status;
+    this.createdAt = createdAt;
+    this.driverShiftId = driverShiftId;
   }
 
   public Order() {}
 
-  public void setCreatedAt(LocalDateTime createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public void setPrice(double price) {
-    this.price = price;
-  }
-
-  public void setPaid(boolean paid) {
-    isPaid = paid;
-  }
-
-  private boolean isPaid;
-
   public void setId(int id) {
     this.id = id;
-  }
-
-  public void setClientId(int clientId) {
-    this.clientId = clientId;
   }
 
   public void setDriverShiftId(int driverShiftId) {
@@ -53,22 +53,6 @@ public class Order{
 
   public void setStatus(OrderStatus status) {
     this.status = status;
-  }
-
-  public void setPickupLat(int pickupLat) {
-    this.pickupLat = pickupLat;
-  }
-
-  public void setPickupLon(int pickupLon) {
-    this.pickupLon = pickupLon;
-  }
-
-  public void setDropOffLat(int dropOffLat) {
-    this.dropOffLat = dropOffLat;
-  }
-
-  public void setDropOffLon(int dropOffLon) {
-    this.dropOffLon = dropOffLon;
   }
 
   public boolean isPaid() {
@@ -114,5 +98,23 @@ public class Order{
   public OrderStatus getStatus() {
     return status;
   }
+
+  public String toJson() {
+    return String.format(Locale.US,
+        """
+        {
+          "id":%d,
+          "pickupLat":%d,
+          "pickupLon":%d,
+          "dropoffLat":%d,
+          "dropoffLon":%d,
+          "price":%.2f,
+          "status":"%s"
+        }
+        """,
+            id, pickupLat, pickupLon, dropOffLat, dropOffLon, price, status.name()
+    );
+  }
+
 }
 

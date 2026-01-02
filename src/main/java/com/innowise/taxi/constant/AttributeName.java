@@ -31,6 +31,7 @@ public class AttributeName {
   public static final String AVG_PRICE = "avg_price";
   public static final String DROPOFF_LAT = "dropoffLat";
   public static final String DROPOFF_LON = "dropoffLon";
+  public static final String DRIVER_SHIFT_ID = "driver_shift_id";
 
   private AttributeName(){}
 }

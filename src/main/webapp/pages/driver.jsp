@@ -21,24 +21,23 @@
   <p>Your car: ${car_model} (${car_plate_number})</p>
   <p>Your current location: (${driver_latitude};${driver_longitude})</p>
 
-    <div class="location-map">
-      <div class="location-cell"></div>
+  <div class="location-map">
+    <div class="location-cell"></div>
+    <c:forEach var="col" begin="0" end="7">
+      <div class="location-cell">${col}</div>
+    </c:forEach>
+
+    <c:forEach var="row" begin="0" end="7">
+      <div class="location-cell">${row}</div>
       <c:forEach var="col" begin="0" end="7">
-        <div class="location-cell">${col}</div>
+        <div class="location-cell">
+          <c:if test="${row == driver_latitude && col == driver_longitude}">
+            <img src="${pageContext.request.contextPath}/images/current_location.png" alt="Driver location">
+          </c:if>
+        </div>
       </c:forEach>
-
-      <c:forEach var="row" begin="0" end="7">
-        <div class="location-cell">${row}</div>
-        <c:forEach var="col" begin="0" end="7">
-          <div class="location-cell">
-            <c:if test="${row == driver_latitude && col == driver_longitude}">
-              <img src="${pageContext.request.contextPath}/images/current_location.png" alt="Driver location">
-            </c:if>
-          </div>
-        </c:forEach>
-      </c:forEach>
-    </div>
-
+    </c:forEach>
+  </div>
 </c:if>
 
 <br/>
@@ -46,6 +45,10 @@
   <input type="hidden" name="command" value="driver_shift"/>
   <input type="submit" value="${driver_shift_active ? 'End shift' : 'Start shift'}"/>
 </form>
+
+<div id="ordersList">
+  <p>Loading orders...</p>
+</div>
 
 <br/><br/>
 <form action="${pageContext.request.contextPath}/controller" method="post">
@@ -57,6 +60,45 @@
   <p style="color:red">${driver_error}</p>
   <c:remove var="driver_error" scope="session"/>
 </c:if>
+
+<script>
+    function loadOrders() {
+        fetch('${pageContext.request.contextPath}/controller?command=driver_order')
+            .then(r => r.json())
+            .then(data => {
+                console.log("Orders JSON:", data);
+                const list = document.getElementById("ordersList");
+                list.innerHTML = "";
+                if (!Array.isArray(data) || data.length === 0) {
+                    list.innerHTML = "<p>No orders assigned yet.</p>";
+                    return;
+                }
+                const ul = document.createElement("ul");
+                data.forEach(order => {
+                    console.log("Order object:", order);
+                    const li = document.createElement("li");
+
+                    li.textContent = "Order #" + order.id +
+                        ": pickup (" + order.pickupLat + "," + order.pickupLon + ")" +
+                        " → dropoff (" + order.dropoffLat + "," + order.dropoffLon + ")" +
+                        ", price " + order.price;
+                    ul.appendChild(li);
+                });
+                list.appendChild(ul);
+
+                data.forEach(order => {
+                    console.log("Keys:", Object.keys(order));
+                    for (const [k,v] of Object.entries(order)) {
+                        console.log(k, "=", v);
+                    }
+                });
+            })
+            .catch(err => console.error("Error loading orders", err));
+    }
+
+    setInterval(loadOrders, 5000);
+    loadOrders();
+</script>
 
 </body>
 </html>

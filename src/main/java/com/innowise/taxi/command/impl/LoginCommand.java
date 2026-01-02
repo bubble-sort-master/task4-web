@@ -94,6 +94,7 @@ public class LoginCommand implements Command {
       session.setAttribute(AttributeName.CAR_PLATE_NUMBER, car.getPlateNumber());
       session.setAttribute(AttributeName.DRIVER_LATITUDE, shift.getCurrentLat());
       session.setAttribute(AttributeName.DRIVER_LONGITUDE, shift.getCurrentLon());
+      session.setAttribute(AttributeName.DRIVER_SHIFT_ID, shift.getId());
     } else {
       session.setAttribute(AttributeName.DRIVER_SHIFT_ACTIVE, false);
     }

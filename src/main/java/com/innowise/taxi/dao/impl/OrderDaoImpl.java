@@ -10,6 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class OrderDaoImpl implements OrderDao {
@@ -24,6 +26,8 @@ public class OrderDaoImpl implements OrderDao {
     "UPDATE orders SET status=? WHERE id=?";
   private static final String SET_DRIVER_SQL =
     "UPDATE orders SET driver_shift_id=? WHERE id=?";
+  private static final String FIND_BY_DRIVER_SHIFT_SQL =
+    "SELECT * FROM orders WHERE driver_shift_id=? AND status='NEW'";
 
   @Override
   public Order insert(Order order) throws DaoException {
@@ -81,6 +85,28 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
+  public List<Order> findByDriverShiftId(int driverShiftId) throws DaoException {
+    List<Order> orders = new ArrayList<>();
+    Connection connection = null;
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+      try (PreparedStatement ps = connection.prepareStatement(FIND_BY_DRIVER_SHIFT_SQL)) {
+        ps.setInt(1, driverShiftId);
+        try (ResultSet rs = ps.executeQuery()) {
+          while (rs.next()) {
+            orders.add(mapRow(rs));
+          }
+        }
+      }
+    } catch (SQLException e) {
+      throw new DaoException("SQL error while finding orders for driver shift");
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
+    return orders;
+  }
+
+  @Override
   public boolean updateStatus(int id, OrderStatus status) throws DaoException {
     Connection connection = null;
     try {
@@ -115,20 +141,20 @@ public class OrderDaoImpl implements OrderDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
   }
-
   private Order mapRow(ResultSet rs) throws SQLException {
-    Order order = new Order();
-    order.setId(rs.getInt(ID));
-    order.setClientId(rs.getInt(CLIENT_ID));
-    order.setDriverShiftId(rs.getInt(DRIVER_SHIFT_ID));
-    order.setStatus(OrderStatus.valueOf(rs.getString(STATUS)));
-    order.setPickupLat(rs.getInt(PICKUP_LAT));
-    order.setPickupLon(rs.getInt(PICKUP_LON));
-    order.setDropOffLat(rs.getInt(DROPOFF_LAT));
-    order.setDropOffLon(rs.getInt(DROPOFF_LON));
-    order.setPrice(rs.getDouble(PRICE));
-    order.setPaid(rs.getBoolean(IS_PAID));
-    order.setCreatedAt(rs.getTimestamp(CREATED_AT).toLocalDateTime());
-    return order;
+    return new Order(
+            rs.getInt(ID),
+            rs.getInt(CLIENT_ID),
+            rs.getInt(DRIVER_SHIFT_ID),
+            OrderStatus.valueOf(rs.getString(STATUS)),
+            rs.getInt(PICKUP_LAT),
+            rs.getInt(PICKUP_LON),
+            rs.getInt(DROPOFF_LAT),
+            rs.getInt(DROPOFF_LON),
+            rs.getDouble(PRICE),
+            rs.getBoolean(IS_PAID),
+            rs.getTimestamp(CREATED_AT).toLocalDateTime()
+    );
   }
+
 }

@@ -39,6 +39,7 @@ public class DriverShiftCommand implements Command {
           session.setAttribute(AttributeName.CAR_PLATE_NUMBER, car.getPlateNumber());
           session.setAttribute(AttributeName.DRIVER_LATITUDE, shift.getCurrentLat());
           session.setAttribute(AttributeName.DRIVER_LONGITUDE, shift.getCurrentLon());
+          session.setAttribute(AttributeName.DRIVER_SHIFT_ID, shift.getId());
         } else {
           session.setAttribute(AttributeName.DRIVER_ERROR, "No available cars");
         }
@@ -53,6 +54,7 @@ public class DriverShiftCommand implements Command {
         session.removeAttribute(AttributeName.CAR_PLATE_NUMBER);
         session.removeAttribute(AttributeName.DRIVER_LATITUDE);
         session.removeAttribute(AttributeName.DRIVER_LONGITUDE);
+        session.removeAttribute(AttributeName.DRIVER_SHIFT_ID);
       }
     } catch (ServiceException e) {
       session.setAttribute(AttributeName.DRIVER_ERROR, "Internal error, please try later");

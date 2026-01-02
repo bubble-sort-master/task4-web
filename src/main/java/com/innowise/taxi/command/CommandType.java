@@ -10,7 +10,8 @@ public enum CommandType {
     SHOW_USERS(new ShowUsersCommand()),
     SHOW_CARS(new ShowCarsCommand()),
     DRIVER_SHIFT(new DriverShiftCommand()),
-    CLIENT_ORDER(new ClientOrderCommand());
+    CLIENT_ORDER(new ClientOrderCommand()),
+    DRIVER_ORDER(new DriverOrderCommand());
 
     final Command command;
 

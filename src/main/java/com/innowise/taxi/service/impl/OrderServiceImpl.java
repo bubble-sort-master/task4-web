@@ -6,6 +6,8 @@ import com.innowise.taxi.entity.Order;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.OrderService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,36 +15,55 @@ import java.util.Optional;
 public class OrderServiceImpl implements OrderService {
   private static final OrderServiceImpl instance = new OrderServiceImpl();
   private final OrderDao orderDao = new OrderDaoImpl();
+  private static final Logger logger = LogManager.getLogger();
 
   private OrderServiceImpl() {}
 
-  public static OrderServiceImpl getInstance() {return instance;}
-
-  @Override
-  public Optional<Order> findById(int id) throws ServiceException {
-    try {
-      return orderDao.findById(id);
-    } catch (DaoException e) {
-      throw new ServiceException("Failed to find order by id=" + id, e);
-    }
+  public static OrderServiceImpl getInstance() {
+    return instance;
   }
 
   @Override
   public boolean create(Order order) throws ServiceException {
     try {
+      logger.debug("Attempting to create order: {}", order);
       Order inserted = orderDao.insert(order);
-      return inserted.getId() > 0;
+      boolean success = inserted.getId() > 0;
+      logger.info("Order creation {} for orderId={}", success ? "succeeded" : "failed", inserted.getId());
+      return success;
     } catch (DaoException e) {
+      logger.error("Failed to create order: {}", order, e);
       throw new ServiceException("Failed to create order", e);
     }
   }
 
   @Override
-  public List<Order> findAll() throws ServiceException {
+  public Optional<Order> findById(int id) throws ServiceException {
     try {
-      throw new UnsupportedOperationException("findAll not implemented yet");
-    } catch (Exception e) {
-      throw new ServiceException("Failed to find all orders", e);
+      logger.debug("Searching for order by id={}", id);
+      Optional<Order> result = orderDao.findById(id);
+      if (result.isPresent()) {
+        logger.info("Order found: {}", result.get());
+      } else {
+        logger.warn("Order not found for id={}", id);
+      }
+      return result;
+    } catch (DaoException e) {
+      logger.error("Failed to find order by id={}", id, e);
+      throw new ServiceException("Failed to find order by id=" + id, e);
+    }
+  }
+
+  @Override
+  public List<Order> findOrdersForDriver(int driverShiftId) throws ServiceException {
+    try {
+      logger.debug("Searching for orders assigned to driverShiftId={}", driverShiftId);
+      List<Order> orders = orderDao.findByDriverShiftId(driverShiftId);
+      logger.info("Found {} orders for driverShiftId={}", orders.size(), driverShiftId);
+      return orders;
+    } catch (DaoException e) {
+      logger.error("Failed to find orders for driverShiftId={}", driverShiftId, e);
+      throw new ServiceException("Failed to find orders for driver", e);
     }
   }
 }

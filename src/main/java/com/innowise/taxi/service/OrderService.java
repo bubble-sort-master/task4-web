@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-  Optional<Order> findById(int id) throws ServiceException;
   boolean create(Order order) throws ServiceException;
-  List<Order> findAll() throws ServiceException;
+  Optional<Order> findById(int id) throws ServiceException;
+  List<Order> findOrdersForDriver(int driverShiftId) throws ServiceException;
 }

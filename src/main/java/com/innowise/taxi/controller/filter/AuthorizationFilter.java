@@ -46,7 +46,8 @@ public class AuthorizationFilter implements Filter {
             CommandType.SHOW_CARS.name()
     ));
     roleCommands.put(UserRole.DRIVER, Set.of(
-            CommandType.DRIVER_SHIFT.name()
+            CommandType.DRIVER_SHIFT.name(),
+            CommandType.DRIVER_ORDER.name()
     ));
     roleCommands.put(UserRole.CLIENT, Set.of(
             CommandType.CLIENT_ORDER.name()
