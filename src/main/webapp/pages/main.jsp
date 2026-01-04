@@ -18,6 +18,9 @@
 <br/><br/>
 <p>Your current location: (${client_latitude};${client_longitude})</p>
 <br/>
+
+<div id="driver-info"></div>
+
 <div class="location-map">
   <div class="location-cell"></div>
   <c:forEach var="col" begin="0" end="7">
@@ -41,6 +44,7 @@
     </c:forEach>
   </c:forEach>
 </div>
+
 <c:if test="${not empty avg_price}">
   <p>Approximate cost: ${avg_price}</p>
 </c:if>
@@ -86,5 +90,33 @@
   <input type="hidden" name="command" value="logout"/>
   <input type="submit" value="Logout"/>
 </form>
+
+<script>
+    let orderId = "${order_id}";
+    let pollingInterval;
+
+    function checkOrderStatus() {
+        fetch("${pageContext.request.contextPath}/controller?command=client_order&action=check_status&orderId=" + orderId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status && data.status === "waiting") {
+                    console.log("Order still waiting...");
+                } else if (data.driverName) {
+                    clearInterval(pollingInterval);
+                    document.getElementById("driver-info").innerHTML =
+                        "<h3>Your driver:</h3>" +
+                        "<p>Name: " + data.driverName + "</p>" +
+                        "<p>Car: " + data.carModel + " (" + data.carPlate + ")</p>" +
+                        "<p>Current location: (" + data.currentLat + ";" + data.currentLon + ")</p>";
+                }
+            })
+            .catch(err => console.error("Polling error", err));
+    }
+
+    if (orderId) {
+        pollingInterval = setInterval(checkOrderStatus, 5000);
+    }
+</script>
+
 </body>
 </html>

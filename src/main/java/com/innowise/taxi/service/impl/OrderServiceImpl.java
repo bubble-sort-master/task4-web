@@ -25,23 +25,26 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public boolean create(Order order) throws ServiceException {
+  public Order create(Order order) throws ServiceException {
     try {
-      logger.debug("Attempting to create order: {}", order);
       Order inserted = orderDao.insert(order);
-      boolean success = inserted.getId() > 0;
-      logger.info("Order creation {} for orderId={}", success ? "succeeded" : "failed", inserted.getId());
-      return success;
+      if (inserted.getId() > 0) {
+        logger.info("Order creation succeeded for orderId={}", inserted.getId());
+        return inserted;
+      } else {
+        logger.warn("Order creation failed, no id assigned");
+        throw new ServiceException("Order creation failed");
+      }
     } catch (DaoException e) {
       logger.error("Failed to create order: {}", order, e);
       throw new ServiceException("Failed to create order", e);
     }
   }
 
+
   @Override
   public Optional<Order> findById(int id) throws ServiceException {
     try {
-      logger.debug("Searching for order by id={}", id);
       Optional<Order> result = orderDao.findById(id);
       if (result.isPresent()) {
         logger.info("Order found: {}", result.get());
@@ -58,7 +61,6 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public List<Order> findOrdersForDriver(int driverShiftId) throws ServiceException {
     try {
-      logger.debug("Searching for orders assigned to driverShiftId={}", driverShiftId);
       List<Order> orders = orderDao.findByDriverShiftId(driverShiftId);
       logger.info("Found {} orders for driverShiftId={}", orders.size(), driverShiftId);
       return orders;
@@ -75,6 +77,17 @@ public class OrderServiceImpl implements OrderService {
     } catch (DaoException e) {
       logger.error("Failed to accept order with id={}", orderId, e);
       throw new ServiceException("Error while accepting order", e);
+    }
+  }
+
+  @Override
+  public boolean isOrderInProgress(int orderId) throws ServiceException {
+    try {
+      Optional<Order> orderOpt = orderDao.findById(orderId);
+      return orderOpt.isPresent() && orderOpt.get().getStatus() == OrderStatus.IN_PROGRESS;
+    } catch (DaoException e) {
+      logger.error("Error checking order status for id={}", orderId, e);
+      throw new ServiceException("Failed to check order status", e);
     }
   }
 

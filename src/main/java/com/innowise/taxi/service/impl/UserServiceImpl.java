@@ -46,7 +46,6 @@ public class UserServiceImpl implements UserService {
     }
   }
 
-
   @Override
   public boolean register(User user) throws ServiceException {
     try {
@@ -75,6 +74,16 @@ public class UserServiceImpl implements UserService {
       return userDaoImpl.findAll();
     } catch (DaoException e) {
       logger.error("Service error while finding all users", e);
+      throw new ServiceException(e);
+    }
+  }
+
+  @Override
+  public Optional<User> findById(int id) throws ServiceException {
+    try {
+      return userDaoImpl.findById(id);
+    } catch (DaoException e) {
+      logger.error("Service error while finding user by id={}", id, e);
       throw new ServiceException(e);
     }
   }

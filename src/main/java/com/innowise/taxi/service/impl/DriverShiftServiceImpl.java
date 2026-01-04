@@ -62,4 +62,15 @@ public class DriverShiftServiceImpl implements DriverShiftService {
       throw new ServiceException(e);
     }
   }
+
+  @Override
+  public Optional<DriverShift> findById(int shiftId) throws ServiceException {
+    try {
+      return driverShiftDao.findById(shiftId);
+    } catch (DaoException e) {
+      logger.error("Error finding driver shift with id={}", shiftId, e);
+      throw new ServiceException("Failed to find driver shift", e);
+    }
+  }
+
 }

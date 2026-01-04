@@ -1,4 +1,5 @@
 package com.innowise.taxi.dao.impl;
+
 import com.innowise.taxi.dao.UserDao;
 import com.innowise.taxi.entity.UserRole;
 import com.innowise.taxi.entity.User;
@@ -7,6 +8,7 @@ import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.pool.ConnectionPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,14 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
   private static final Logger logger = LogManager.getLogger();
-  private static final String SELECT_BY_USERNAME ="""
+
+  private static final String SELECT_BY_USERNAME = """
     SELECT id, username, password, role, first_name, last_name, bonus_points, is_banned
     FROM users WHERE username = ?
+    """;
+  private static final String SELECT_BY_ID = """
+    SELECT id, username, password, role, first_name, last_name, bonus_points, is_banned
+    FROM users WHERE id = ?
     """;
   private static final String INSERT_USER = """
     INSERT INTO users (username, password, first_name, last_name)
@@ -36,16 +43,7 @@ public class UserDaoImpl implements UserDao {
         statement.setString(1, username);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
-            User user = new User(
-                    result.getInt(ID),
-                    result.getString(USERNAME),
-                    result.getString(PASSWORD),
-                    UserRole.valueOf(result.getString(ROLE).toUpperCase()),
-                    result.getString(FIRST_NAME),
-                    result.getString(LAST_NAME),
-                    result.getInt(BONUS_POINTS),
-                    result.getBoolean(BANNED)
-            );
+            User user = mapRow(result);
             logger.info("User {} found in database", username);
             return Optional.of(user);
           }
@@ -58,6 +56,28 @@ public class UserDaoImpl implements UserDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
     logger.warn("User {} not found", username);
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<User> findById(int id) throws DaoException {
+    Connection connection = null;
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+      try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+        statement.setInt(1, id);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(mapRow(result));
+          }
+        }
+      }
+    } catch (SQLException e) {
+      logger.error("Error while finding user by id {}", id, e);
+      throw new DaoException(e);
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
     return Optional.empty();
   }
 
@@ -99,18 +119,7 @@ public class UserDaoImpl implements UserDao {
       try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_USERS);
            ResultSet result = statement.executeQuery()) {
         while (result.next()) {
-          User user = new User(
-                  result.getInt(ID),
-                  result.getString(USERNAME),
-                  result.getString(PASSWORD),
-                  UserRole.valueOf(result.getString(ROLE).toUpperCase()),
-                  result.getString(FIRST_NAME),
-                  result.getString(LAST_NAME),
-                  result.getInt(BONUS_POINTS),
-                  result.getBoolean(BANNED)
-          );
-
-          users.add(user);
+          users.add(mapRow(result));
         }
       }
     } catch (SQLException e) {
@@ -120,5 +129,18 @@ public class UserDaoImpl implements UserDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
     return users;
+  }
+
+  private User mapRow(ResultSet result) throws SQLException {
+    return new User(
+            result.getInt("id"),
+            result.getString("username"),
+            result.getString("password"),
+            UserRole.valueOf(result.getString("role").toUpperCase()),
+            result.getString("first_name"),
+            result.getString("last_name"),
+            result.getInt("bonus_points"),
+            result.getBoolean("is_banned")
+    );
   }
 }

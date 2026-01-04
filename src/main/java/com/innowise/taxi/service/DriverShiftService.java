@@ -9,5 +9,5 @@ public interface DriverShiftService {
   boolean closeDriverShift(int shiftId) throws ServiceException;
   Optional<DriverShift> startDriverShift(int userId) throws ServiceException;
   Optional<DriverShift> findActiveDriverShift(int driverID) throws ServiceException;
-
+  Optional<DriverShift> findById(int shiftId) throws ServiceException;
 }

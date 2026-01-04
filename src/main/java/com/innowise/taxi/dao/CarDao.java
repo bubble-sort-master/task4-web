@@ -14,5 +14,4 @@ public interface CarDao {
 
   List<Car> findAll() throws DaoException;
   Car findById(int Id) throws DaoException;
-  Optional<Car> findFreeCar() throws DaoException;
 }

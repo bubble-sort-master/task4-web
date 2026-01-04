@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.Optional;
 
 public class CarDaoImpl implements CarDao {
   private static final Logger logger = LogManager.getLogger();
@@ -19,13 +18,6 @@ public class CarDaoImpl implements CarDao {
     SELECT id, model, plate_number, year
     FROM cars
     """;
-
-  private static final String SELECT_FREE_CAR = """
-    SELECT id, model, plate_number, year
-    FROM cars
-    WHERE id NOT IN (SELECT car_id FROM driver_shifts WHERE status='ACTIVE')
-    LIMIT 1
-""";
 
   private static final String SELECT_BY_ID = """
     SELECT id, model, plate_number, year
@@ -76,27 +68,6 @@ public class CarDaoImpl implements CarDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
     throw new DaoException("Car not found with id=" + id);
-  }
-
-  @Override
-  public Optional<Car> findFreeCar() throws DaoException {
-    Connection connection = null;
-    try {
-      connection = ConnectionPool.getInstance().getConnection();
-      try (PreparedStatement statement = connection.prepareStatement(SELECT_FREE_CAR);
-           ResultSet result = statement.executeQuery()) {
-        if (result.next()) {
-          Car car = mapRowToCar(result);
-          return Optional.of(car);
-        }
-      }
-    } catch (SQLException e) {
-      logger.error("Error while finding free car", e);
-      throw new DaoException(e);
-    } finally {
-      ConnectionPool.getInstance().releaseConnection(connection);
-    }
-    return Optional.empty();
   }
 
   private Car mapRowToCar(ResultSet rs) throws SQLException {

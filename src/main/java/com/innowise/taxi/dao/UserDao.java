@@ -19,4 +19,5 @@ public interface UserDao {
   Optional<User> findByUsername(String username) throws DaoException;
   boolean save(User user) throws DaoException;
   List<User> findAll() throws DaoException;
+  Optional<User> findById(int id) throws DaoException;
 }
