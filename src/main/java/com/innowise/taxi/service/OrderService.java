@@ -10,4 +10,5 @@ public interface OrderService {
   boolean create(Order order) throws ServiceException;
   Optional<Order> findById(int id) throws ServiceException;
   List<Order> findOrdersForDriver(int driverShiftId) throws ServiceException;
+  boolean acceptOrder(int orderId) throws ServiceException;
 }

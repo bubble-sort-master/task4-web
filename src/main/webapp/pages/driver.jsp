@@ -10,6 +10,11 @@
 <head>
   <title>Driver Main</title>
   <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet" type="text/css">
+  <style>
+      .order-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+      .accept-btn { margin-left: 10px; }
+      .map-marker { font-weight: bold; color: red; }
+  </style>
 </head>
 <body>
 <h2>Welcome, ${firstName} ${lastName} (DRIVER)</h2>
@@ -21,7 +26,7 @@
   <p>Your car: ${car_model} (${car_plate_number})</p>
   <p>Your current location: (${driver_latitude};${driver_longitude})</p>
 
-  <div class="location-map">
+  <div id="map" class="location-map">
     <div class="location-cell"></div>
     <c:forEach var="col" begin="0" end="7">
       <div class="location-cell">${col}</div>
@@ -30,7 +35,7 @@
     <c:forEach var="row" begin="0" end="7">
       <div class="location-cell">${row}</div>
       <c:forEach var="col" begin="0" end="7">
-        <div class="location-cell">
+        <div class="location-cell" id="cell-${row}-${col}">
           <c:if test="${row == driver_latitude && col == driver_longitude}">
             <img src="${pageContext.request.contextPath}/images/current_location.png" alt="Driver location">
           </c:if>
@@ -63,38 +68,65 @@
 
 <script>
     function loadOrders() {
-        fetch('${pageContext.request.contextPath}/controller?command=driver_order')
+        fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=search')
             .then(r => r.json())
             .then(data => {
-                console.log("Orders JSON:", data);
                 const list = document.getElementById("ordersList");
                 list.innerHTML = "";
+                document.querySelectorAll(".map-marker").forEach(el => el.remove());
+
                 if (!Array.isArray(data) || data.length === 0) {
                     list.innerHTML = "<p>No orders assigned yet.</p>";
                     return;
                 }
-                const ul = document.createElement("ul");
-                data.forEach(order => {
-                    console.log("Order object:", order);
-                    const li = document.createElement("li");
 
-                    li.textContent = "Order #" + order.id +
+                const ul = document.createElement("ul");
+                data.forEach((order, index) => {
+                    const li = document.createElement("li");
+                    li.className = "order-item";
+
+                    const orderNumber = index + 1;
+                    const text = "Order #" + orderNumber +
                         ": pickup (" + order.pickupLat + "," + order.pickupLon + ")" +
                         " → dropoff (" + order.dropoffLat + "," + order.dropoffLon + ")" +
                         ", price " + order.price;
-                    ul.appendChild(li);
-                });
-                list.appendChild(ul);
 
-                data.forEach(order => {
-                    console.log("Keys:", Object.keys(order));
-                    for (const [k,v] of Object.entries(order)) {
-                        console.log(k, "=", v);
+                    const span = document.createElement("span");
+                    span.textContent = text;
+
+                    const btn = document.createElement("button");
+                    btn.className = "accept-btn";
+                    btn.textContent = "Accept";
+                    btn.onclick = () => {
+                        fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=accept&orderId=' + order.id)
+                            .then(r => r.json())
+                            .then(resp => {
+                                if (resp.accepted) {
+                                    console.log("Order accepted successfully");
+                                } else {
+                                    console.log("Failed to accept order");
+                                }
+                            });
+                    };
+
+                    li.appendChild(span);
+                    li.appendChild(btn);
+                    ul.appendChild(li);
+
+                    const cellId = "cell-" + order.pickupLat + "-" + order.pickupLon;
+                    const cell = document.getElementById(cellId);
+                    if (cell) {
+                        const marker = document.createElement("span");
+                        marker.className = "map-marker";
+                        marker.textContent = orderNumber;
+                        cell.appendChild(marker);
                     }
                 });
+                list.appendChild(ul);
             })
             .catch(err => console.error("Error loading orders", err));
     }
+
 
     setInterval(loadOrders, 5000);
     loadOrders();

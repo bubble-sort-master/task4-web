@@ -3,6 +3,7 @@ package com.innowise.taxi.service.impl;
 import com.innowise.taxi.dao.OrderDao;
 import com.innowise.taxi.dao.impl.OrderDaoImpl;
 import com.innowise.taxi.entity.Order;
+import com.innowise.taxi.entity.OrderStatus;
 import com.innowise.taxi.exception.DaoException;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.OrderService;
@@ -66,4 +67,15 @@ public class OrderServiceImpl implements OrderService {
       throw new ServiceException("Failed to find orders for driver", e);
     }
   }
+
+  @Override
+  public boolean acceptOrder(int orderId) throws ServiceException {
+    try {
+      return orderDao.updateStatus(orderId, OrderStatus.IN_PROGRESS);
+    } catch (DaoException e) {
+      logger.error("Failed to accept order with id={}", orderId, e);
+      throw new ServiceException("Error while accepting order", e);
+    }
+  }
+
 }
