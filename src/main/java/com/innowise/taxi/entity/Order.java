@@ -1,7 +1,6 @@
 package com.innowise.taxi.entity;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 
 public class Order{
   private int id;
@@ -12,7 +11,7 @@ public class Order{
   private int pickupLon;
   private int dropOffLat;
   private int dropOffLon;
-  private LocalDateTime createdAt;
+  private transient LocalDateTime createdAt;
   private boolean isPaid;
   private double price;
 
@@ -97,23 +96,6 @@ public class Order{
 
   public OrderStatus getStatus() {
     return status;
-  }
-
-  public String toJson() {
-    return String.format(Locale.US,
-        """
-        {
-          "id":%d,
-          "pickupLat":%d,
-          "pickupLon":%d,
-          "dropoffLat":%d,
-          "dropoffLon":%d,
-          "price":%.2f,
-          "status":"%s"
-        }
-        """,
-            id, pickupLat, pickupLon, dropOffLat, dropOffLon, price, status.name()
-    );
   }
 
 }

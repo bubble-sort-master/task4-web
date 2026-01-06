@@ -67,6 +67,9 @@
 </c:if>
 
 <script>
+    let activeOrderId = "${order_id}";
+    let pollingInterval;
+
     function loadOrders() {
         fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=search')
             .then(r => r.json())
@@ -93,24 +96,26 @@
 
                     const span = document.createElement("span");
                     span.textContent = text;
-
-                    const btn = document.createElement("button");
-                    btn.className = "accept-btn";
-                    btn.textContent = "Accept";
-                    btn.onclick = () => {
-                        fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=accept&orderId=' + order.id)
-                            .then(r => r.json())
-                            .then(resp => {
-                                if (resp.accepted) {
-                                    console.log("Order accepted successfully");
-                                } else {
-                                    console.log("Failed to accept order");
-                                }
-                            });
-                    };
-
                     li.appendChild(span);
-                    li.appendChild(btn);
+
+                    if (!activeOrderId) {
+                        const acceptBtn = document.createElement("button");
+                        acceptBtn.className = "accept-btn";
+                        acceptBtn.textContent = "Accept";
+                        acceptBtn.onclick = () => {
+                            fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=accept&orderId=' + order.id)
+                                .then(r => r.json())
+                                .then(resp => {
+                                    if (resp.accepted) {
+                                        activeOrderId = order.id;
+                                        clearInterval(pollingInterval);
+                                        renderCompleteButton(order.id);
+                                    }
+                                });
+                        };
+                        li.appendChild(acceptBtn);
+                    }
+
                     ul.appendChild(li);
 
                     const cellId = "cell-" + order.pickupLat + "-" + order.pickupLon;
@@ -127,9 +132,28 @@
             .catch(err => console.error("Error loading orders", err));
     }
 
+    function renderCompleteButton(orderId) {
+        const list = document.getElementById("ordersList");
+        list.innerHTML = "";
+        const btn = document.createElement("button");
+        btn.textContent = "Complete";
+        btn.onclick = () => {
+            fetch('${pageContext.request.contextPath}/controller?command=driver_order&action=complete&orderId=' + orderId)
+                .then(() => {
+                    activeOrderId = null;
+                    pollingInterval = setInterval(loadOrders, 5000);
+                    loadOrders();
+                });
+        };
+        list.appendChild(btn);
+    }
 
-    setInterval(loadOrders, 5000);
-    loadOrders();
+    if (!activeOrderId) {
+        pollingInterval = setInterval(loadOrders, 5000);
+        loadOrders();
+    } else {
+        renderCompleteButton(activeOrderId);
+    }
 </script>
 
 </body>

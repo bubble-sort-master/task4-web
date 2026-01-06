@@ -41,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
     }
   }
 
-
   @Override
   public Optional<Order> findById(int id) throws ServiceException {
     try {
@@ -91,4 +90,21 @@ public class OrderServiceImpl implements OrderService {
     }
   }
 
+  @Override
+  public boolean pay(int orderId) throws ServiceException {
+    try {
+      return orderDao.updatePayment(orderId);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
+  }
+
+  @Override
+  public boolean complete(int orderId) throws ServiceException {
+    try {
+      return orderDao.updateStatus(orderId, OrderStatus.COMPLETED);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
+  }
 }

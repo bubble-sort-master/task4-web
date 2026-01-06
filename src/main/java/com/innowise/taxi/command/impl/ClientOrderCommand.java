@@ -1,5 +1,6 @@
 package com.innowise.taxi.command.impl;
 
+import com.google.gson.Gson;
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.Router;
 import com.innowise.taxi.constant.AttributeName;
@@ -15,12 +16,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ClientOrderCommand implements Command {
   private static final String CREATE = "create";
   private static final String CHECK_STATUS = "check_status";
   private static final String SEARCH = "search";
+  private static final String PAY = "pay";
   public static final String STATUS_WAITING_JSON = "{\"status\":\"waiting\"}";
 
   private final OrderService orderService = OrderServiceImpl.getInstance();
@@ -101,22 +104,15 @@ public class ClientOrderCommand implements Command {
                   User driver = userOpt.get();
                   Car car = carService.findById(shift.getCarId());
 
-                  String json = String.format(
-                          """
-                          {
-                            "driverName":"%s",
-                            "carModel":"%s",
-                            "carPlate":"%s",
-                            "currentLat":%d,
-                            "currentLon":%d
-                          }
-                          """,
-                          driver.getFirstName(),
-                          car.getModel(),
-                          car.getPlateNumber(),
-                          shift.getCurrentLat(),
-                          shift.getCurrentLon()
+                  Map<String, Object> result = Map.of(
+                          "driverName", driver.getFirstName(),
+                          "carModel", car.getModel(),
+                          "carPlate", car.getPlateNumber(),
+                          "currentLat", shift.getCurrentLat(),
+                          "currentLon", shift.getCurrentLon()
                   );
+
+                  String json = new Gson().toJson(result);
 
                   return new Router(json, Router.TransitionType.DATA);
                 }
@@ -125,6 +121,25 @@ public class ClientOrderCommand implements Command {
           }
           return new Router(STATUS_WAITING_JSON, Router.TransitionType.DATA);
         }
+        case PAY: {
+          int orderId = Integer.parseInt(request.getParameter(ParameterName.ORDER_ID));
+          boolean success = orderService.pay(orderId);
+
+          if (success) {
+            session.setAttribute(AttributeName.PAYMENT_SUCCESS, "Payment completed for orderId=" + orderId);
+            session.removeAttribute(AttributeName.ORDER_ID);
+            session.removeAttribute(AttributeName.NEAREST_DRIVERS);
+            session.removeAttribute(AttributeName.AVG_PRICE);
+            session.removeAttribute(AttributeName.DROPOFF_LAT);
+            session.removeAttribute(AttributeName.DROPOFF_LON);
+          } else {
+            session.setAttribute(AttributeName.PAYMENT_ERROR, "Payment failed for orderId=" + orderId);
+          }
+
+          page = PagePath.CLIENT_MAIN;
+          break;
+        }
+
         default: {
           session.setAttribute(AttributeName.ORDER_ERROR, "Unknown action");
           page = PagePath.CLIENT_MAIN;

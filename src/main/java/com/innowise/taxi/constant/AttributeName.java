@@ -8,7 +8,6 @@ public class AttributeName {
   public static final String ADMIN_ERROR = "admin_err";
   public static final String DRIVER_ERROR = "driver_error";
   public static final String ORDER_ERROR = "orderError";
-  public static final String ORDER_SUCCESS = "orderSuccess";
 
   public static final String USERNAME = "username";
   public static final String USER_ID = "id";
@@ -33,6 +32,9 @@ public class AttributeName {
   public static final String DROPOFF_LON = "dropoffLon";
   public static final String DRIVER_SHIFT_ID = "driver_shift_id";
   public static final String ORDER_ID = "order_id";
+  public static final String PAYMENT_SUCCESS = "payment_success";
+  public static final String PAYMENT_ERROR = "payment_error";
+  public static final String ORDER_COMPLETE_ERROR = "order_complete_error";
 
   private AttributeName(){}
 }

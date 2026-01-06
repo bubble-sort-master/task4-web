@@ -20,6 +20,14 @@
 <br/>
 
 <div id="driver-info"></div>
+<c:if test="${not empty order_id}">
+  <form action="${pageContext.request.contextPath}/controller" method="post">
+    <input type="hidden" name="command" value="client_order"/>
+    <input type="hidden" name="action" value="pay"/>
+    <input type="hidden" name="orderId" value="${order_id}"/>
+    <input type="submit" value="Pay"/>
+  </form>
+</c:if>
 
 <div class="location-map">
   <div class="location-cell"></div>

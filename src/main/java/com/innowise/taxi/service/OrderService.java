@@ -12,4 +12,6 @@ public interface OrderService {
   List<Order> findOrdersForDriver(int driverShiftId) throws ServiceException;
   boolean acceptOrder(int orderId) throws ServiceException;
   boolean isOrderInProgress(int orderId) throws ServiceException;
+  boolean pay(int orderId) throws ServiceException;
+  boolean complete(int orderId) throws ServiceException;
 }

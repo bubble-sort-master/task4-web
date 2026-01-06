@@ -28,6 +28,8 @@ public class OrderDaoImpl implements OrderDao {
     "UPDATE orders SET driver_shift_id=? WHERE id=?";
   private static final String FIND_BY_DRIVER_SHIFT_SQL =
     "SELECT * FROM orders WHERE driver_shift_id=? AND status='NEW'";
+  private static final String UPDATE_PAYMENT_SQL =
+          "UPDATE orders SET is_paid = TRUE WHERE id = ?";
 
   @Override
   public Order insert(Order order) throws DaoException {
@@ -141,6 +143,25 @@ public class OrderDaoImpl implements OrderDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
   }
+
+  @Override
+  public boolean updatePayment(int orderId) throws DaoException {
+    Connection connection = null;
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+      try (PreparedStatement statement = connection.prepareStatement(UPDATE_PAYMENT_SQL)) {
+        statement.setInt(1, orderId);
+        int rows = statement.executeUpdate();
+        return rows > 0;
+      }
+    } catch (SQLException e) {
+      logger.error("Error while updating payment for order {}", orderId, e);
+      throw new DaoException("SQL error while updating payment", e, DaoErrorCode.SQL_ERROR);
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
+  }
+
   private Order mapRow(ResultSet rs) throws SQLException {
     return new Order(
             rs.getInt(ID),

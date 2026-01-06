@@ -25,4 +25,5 @@ public interface OrderDao {
   List<Order> findByDriverShiftId(int driverShiftId) throws DaoException;
   boolean updateStatus(int id, OrderStatus status) throws DaoException;
   boolean setDriverShift(int id, int driverShiftId) throws DaoException;
+  boolean updatePayment(int orderId) throws DaoException;
 }
