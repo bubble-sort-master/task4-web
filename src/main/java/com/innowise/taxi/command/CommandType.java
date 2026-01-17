@@ -11,7 +11,8 @@ public enum CommandType {
     SHOW_CARS(new ShowCarsCommand()),
     DRIVER_SHIFT(new DriverShiftCommand()),
     CLIENT_ORDER(new ClientOrderCommand()),
-    DRIVER_ORDER(new DriverOrderCommand());
+    DRIVER_ORDER(new DriverOrderCommand()),
+    USER_STATUS(new UserStatusCommand()); // ← новая команда
 
     final Command command;
 

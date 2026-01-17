@@ -43,7 +43,8 @@ public class AuthorizationFilter implements Filter {
 
     roleCommands.put(UserRole.ADMIN, Set.of(
             CommandType.SHOW_USERS.name(),
-            CommandType.SHOW_CARS.name()
+            CommandType.SHOW_CARS.name(),
+            CommandType.USER_STATUS.name()
     ));
     roleCommands.put(UserRole.DRIVER, Set.of(
             CommandType.DRIVER_SHIFT.name(),
@@ -66,6 +67,23 @@ public class AuthorizationFilter implements Filter {
     String uri = httpReq.getRequestURI();
 
     if (session != null && session.getAttribute(AttributeName.USERNAME) != null) {
+
+      Boolean banned = (Boolean) session.getAttribute(AttributeName.BANNED);
+      if (Boolean.TRUE.equals(banned)) {
+
+        boolean isBanPage = uri.contains(PagePath.BANNED);
+        boolean isIndex = uri.endsWith(PagePath.INDEX);
+        boolean isLogout = command != null && command.equalsIgnoreCase(CommandType.LOGOUT.name());
+
+        if (!isBanPage && !isIndex && !isLogout) {
+          httpResp.sendRedirect(httpReq.getContextPath() + "/" + PagePath.BANNED);
+          return;
+        }
+
+        chain.doFilter(request, response);
+        return;
+      }
+
       UserRole role = (UserRole) session.getAttribute(AttributeName.ROLE);
       Set<String> allowedPages = rolePages.getOrDefault(role, Set.of());
       Set<String> allowedCommands = roleCommands.getOrDefault(role, Set.of());
@@ -78,7 +96,6 @@ public class AuthorizationFilter implements Filter {
         httpResp.sendRedirect(httpReq.getContextPath() + "/" + mainPage);
         return;
       }
-
 
       boolean allowed = allowedPages.stream().anyMatch(uri::endsWith)
               || publicPages.stream().anyMatch(uri::endsWith)

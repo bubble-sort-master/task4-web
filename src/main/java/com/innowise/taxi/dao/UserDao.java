@@ -20,4 +20,5 @@ public interface UserDao {
   boolean save(User user) throws DaoException;
   List<User> findAll() throws DaoException;
   Optional<User> findById(int id) throws DaoException;
+  boolean updateIsBanned(int userId, boolean banned) throws DaoException;
 }

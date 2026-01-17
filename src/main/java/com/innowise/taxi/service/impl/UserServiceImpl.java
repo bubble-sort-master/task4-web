@@ -88,4 +88,14 @@ public class UserServiceImpl implements UserService {
     }
   }
 
+  @Override
+  public boolean setBanned(int userId, boolean banned) throws ServiceException {
+    try{
+      return userDaoImpl.updateIsBanned(userId, banned);
+    } catch (DaoException e) {
+      logger.error("Service error while setting ban status by user id={}", userId, e);
+      throw new ServiceException(e);
+    }
+  }
+
 }

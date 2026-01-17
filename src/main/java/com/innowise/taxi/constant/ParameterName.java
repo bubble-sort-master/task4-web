@@ -10,6 +10,7 @@ public class ParameterName {
   public static final String ORDER_ID = "orderId";    // id заказа
   public static final String DROPOFF_LAT = "dropoffLat";
   public static final String DROPOFF_LON = "dropoffLon";
+  public static final String USER_ID = "userId";
 
   private ParameterName(){}
 }

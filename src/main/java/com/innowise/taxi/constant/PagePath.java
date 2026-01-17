@@ -8,6 +8,7 @@ public class PagePath {
   public static final String ADMIN_MAIN = "pages/admin.jsp";
   public static final String ADMIN_USER_LIST = "pages/admin_user_list.jsp";
   public static final String ADMIN_CAR_LIST = "pages/admin_car_list.jsp";
+  public static final String BANNED = "pages/banned.jsp";
 
   private PagePath(){}
 }

@@ -33,6 +33,11 @@ public class UserDaoImpl implements UserDao {
     SELECT id, username, password, role, first_name, last_name, bonus_points, is_banned
     FROM users
     """;
+  private static final String UPDATE_IS_BANNED = """
+    UPDATE users
+    SET is_banned = ?
+    WHERE id = ?
+    """;
 
   @Override
   public Optional<User> findByUsername(String username) throws DaoException {
@@ -79,6 +84,30 @@ public class UserDaoImpl implements UserDao {
       ConnectionPool.getInstance().releaseConnection(connection);
     }
     return Optional.empty();
+  }
+
+  @Override
+  public boolean updateIsBanned(int userId, boolean banned) throws DaoException {
+    Connection connection = null;
+
+    try {
+      connection = ConnectionPool.getInstance().getConnection();
+
+      try (PreparedStatement statement = connection.prepareStatement(UPDATE_IS_BANNED)) {
+        statement.setBoolean(1, banned);
+        statement.setInt(2, userId);
+
+        int rows = statement.executeUpdate();
+        return rows > 0;
+      }
+
+    } catch (SQLException e) {
+      logger.error("Error while updating is_banned for userId={}", userId, e);
+      throw new DaoException(e);
+
+    } finally {
+      ConnectionPool.getInstance().releaseConnection(connection);
+    }
   }
 
   @Override

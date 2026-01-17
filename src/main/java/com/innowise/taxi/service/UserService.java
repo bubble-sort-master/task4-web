@@ -10,4 +10,5 @@ public interface UserService {
   boolean register(User user) throws ServiceException;
   List<User> findAllUsers() throws ServiceException;
   Optional<User> findById(int id) throws ServiceException;
+  boolean setBanned(int userId, boolean banned) throws ServiceException;
 }
