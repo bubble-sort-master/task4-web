@@ -1,4 +1,4 @@
-package com.innowise.taxi.constant;
+package com.innowise.taxi.util.constant;
 
 public final class ResponseContent {
   public static final String APPLICATION_JSON = "application/json";

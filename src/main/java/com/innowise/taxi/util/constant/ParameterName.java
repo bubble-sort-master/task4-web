@@ -1,4 +1,4 @@
-package com.innowise.taxi.constant;
+package com.innowise.taxi.util.constant;
 
 public class ParameterName {
   public static final String COMMAND = "command";

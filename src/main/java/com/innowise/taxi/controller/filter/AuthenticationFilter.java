@@ -1,9 +1,9 @@
 package com.innowise.taxi.controller.filter;
 
 import com.innowise.taxi.command.CommandType;
-import com.innowise.taxi.constant.AttributeName;
-import com.innowise.taxi.constant.PagePath;
-import com.innowise.taxi.constant.ParameterName;
+import com.innowise.taxi.util.constant.AttributeName;
+import com.innowise.taxi.util.constant.PagePath;
+import com.innowise.taxi.util.constant.ParameterName;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;

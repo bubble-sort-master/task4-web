@@ -3,7 +3,7 @@ package com.innowise.taxi.command.impl;
 import com.google.gson.Gson;
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.Router;
-import com.innowise.taxi.constant.ParameterName;
+import com.innowise.taxi.util.constant.ParameterName;
 import com.innowise.taxi.exception.ServiceException;
 import com.innowise.taxi.service.UserService;
 import com.innowise.taxi.service.impl.UserServiceImpl;
@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.Map;
-import java.util.HashMap;
 
 public class UserStatusCommand implements Command {
   private static final String BAN_USER = "ban";

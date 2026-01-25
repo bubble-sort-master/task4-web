@@ -2,8 +2,8 @@ package com.innowise.taxi.command.impl;
 
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.Router;
-import com.innowise.taxi.constant.PagePath;
-import com.innowise.taxi.constant.AttributeName;
+import com.innowise.taxi.util.constant.PagePath;
+import com.innowise.taxi.util.constant.AttributeName;
 import com.innowise.taxi.entity.Car;
 import com.innowise.taxi.entity.DriverShift;
 import com.innowise.taxi.service.CarService;

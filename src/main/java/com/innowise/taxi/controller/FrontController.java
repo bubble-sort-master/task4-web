@@ -5,13 +5,13 @@ import java.io.*;
 import com.innowise.taxi.command.Command;
 import com.innowise.taxi.command.CommandType;
 import com.innowise.taxi.command.Router;
-import com.innowise.taxi.constant.ResponseContent;
+import com.innowise.taxi.util.constant.ResponseContent;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 @WebServlet(name = "Servlet", value = "/controller")
-public class Controller extends HttpServlet {
+public class FrontController extends HttpServlet {
   public static final String COMMAND = "command";
 
   public void init() {}

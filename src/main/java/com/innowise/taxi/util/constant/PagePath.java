@@ -1,4 +1,4 @@
-package com.innowise.taxi.constant;
+package com.innowise.taxi.util.constant;
 
 public class PagePath {
   public static final String INDEX = "index.jsp";

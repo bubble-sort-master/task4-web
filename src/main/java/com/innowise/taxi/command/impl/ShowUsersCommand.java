@@ -9,8 +9,8 @@ import com.innowise.taxi.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.innowise.taxi.constant.AttributeName;
-import com.innowise.taxi.constant.PagePath;
+import com.innowise.taxi.util.constant.AttributeName;
+import com.innowise.taxi.util.constant.PagePath;
 
 import java.util.List;
 

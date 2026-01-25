@@ -1,4 +1,4 @@
-package com.innowise.taxi.constant;
+package com.innowise.taxi.util.constant;
 
 public class AttributeName {
   public static final String REGISTER_ERROR = "register_err";
